@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://shalimoosavi.github.io/SYJ-Labs/sitemap.xml
