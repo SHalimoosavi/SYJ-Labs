@@ -9,3 +9,27 @@
 /* Keep GitHub repository preview artwork fully visible. */
 .project-image img[src*="preview-"]{object-fit:contain;background:#070b10}
 .project-card:hover .project-image img[src*="preview-"]{transform:none}
+
+
+/* SYJ LABS founder portrait and QR aspect-ratio fix */
+.founder-card img[src*="founder-photo"] {
+  display: block;
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  object-position: 58% 35%;
+  border-radius: 50%;
+}
+.qr-card img {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  image-rendering: pixelated;
+  background: #fff;
+  padding: 8px;
+  margin: 0 auto;
+  border-radius: 4px;
+}
