@@ -15,16 +15,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          convert -version
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - run: npm install --no-audit --no-fund
+
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
       - run: npm run validate:html
+
       - run: ln -s . dist/SYJ-Labs
+
       - run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
+
       - run: sleep 2 && npx --yes linkinator http://127.0.0.1:4173/SYJ-Labs/ --recurse --silent
 
   accessibility:
@@ -32,15 +45,27 @@ jobs:
     needs: static
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          convert -version
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - run: npm install --no-audit --no-fund
+
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
       - run: ln -s . dist/SYJ-Labs
+
       - run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
+
       - run: sleep 2 && npx pa11y http://127.0.0.1:4173/SYJ-Labs/ --standard WCAG2AA && npx pa11y http://127.0.0.1:4173/SYJ-Labs/projects/ --standard WCAG2AA
 
   lighthouse:
@@ -49,15 +74,28 @@ jobs:
     strategy:
       matrix:
         mode: [mobile, desktop]
+
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          convert -version
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+
       - run: npm install --no-audit --no-fund
+
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
       - run: ln -s . dist/SYJ-Labs
+
       - run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
+
       - run: sleep 2 && npx lhci autorun --config=lighthouserc.${{ matrix.mode }}.json
