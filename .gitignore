@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Local backups
+*.backup
+*.before-*
+.syj-labs-patch-backup/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+
+# Local environment
+.env
+.env.*
+!.env.example

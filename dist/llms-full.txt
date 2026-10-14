@@ -252,7 +252,7 @@ Topics: None listed
 ## SHalimoosavi
 Category: Software Engineering
 Language: Other
-Description: Founder & Managing Director · SAYANJALI NEXUS PRIVATE LIMITED
+Description: Founder · CTO · Managing Director · SAYANJALI NEXUS PRIVATE LIMITED
 Repository: https://github.com/SHalimoosavi/SHalimoosavi
 Page: https://shalimoosavi.github.io/SYJ-Labs/projects/shalimoosavi/
 Last updated: 2026-07-26

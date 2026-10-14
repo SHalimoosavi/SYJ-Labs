@@ -1456,7 +1456,7 @@ For the current implementation, source code and project history, use the linked 
   decoding="async">
 
 <span>
-FOUNDER & MANAGING DIRECTOR
+FOUNDER · CTO · MANAGING DIRECTOR
 </span>
 
 </div>

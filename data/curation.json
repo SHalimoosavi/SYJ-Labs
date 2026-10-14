@@ -1,0 +1,699 @@
+{
+  "generatedAt": "2026-10-14T13:09:11.240Z",
+  "_defaults": {
+    "include": true,
+    "category": "Software Engineering",
+    "status": "active"
+  },
+  "overrides": {
+    "SYJ-LLM": {
+      "include": true,
+      "category": "AI",
+      "flagship": 1,
+      "status": "active"
+    },
+    "SYJ-SCHOLAR-AI": {
+      "include": true,
+      "category": "AI & Education",
+      "flagship": 2,
+      "status": "active"
+    },
+    "SYJ-NexusIntel-AI-web": {
+      "include": true,
+      "category": "AI & SaaS",
+      "flagship": 3,
+      "status": "active"
+    },
+    "SYJ-LaunchPad": {
+      "include": true,
+      "category": "Blockchain",
+      "flagship": 4,
+      "status": "active"
+    },
+    "SAYANJALI-BLOCKCHAIN": {
+      "include": true,
+      "category": "Blockchain",
+      "flagship": 5,
+      "status": "active"
+    },
+    "sayanjali-osint": {
+      "include": true,
+      "category": "Security & OSINT",
+      "flagship": 6,
+      "status": "active"
+    },
+    "SYJ-OpenTrade-Logic": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": 7,
+      "status": "active"
+    },
+    "SYJ-GST-Reconciliation": {
+      "include": true,
+      "category": "Automation & Finance",
+      "flagship": 8,
+      "status": "active"
+    },
+    "DevXchange": {
+      "include": false,
+      "category": "Software Engineering",
+      "status": "planned",
+      "reason": "Empty repository at the last verified inventory."
+    },
+    "SAYANJALI-NEXUS": {
+      "include": false,
+      "category": "Company",
+      "status": "empty",
+      "reason": "Empty repository."
+    },
+    "syj-nopager-test": {
+      "include": false,
+      "category": "Test",
+      "status": "hidden",
+      "reason": "Test repository."
+    }
+  },
+  "repositories": {
+    "SYJ-Labs": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "A responsive, static portfolio for SYJ LABS using HTML, CSS and vanilla JavaScript."
+    },
+    "SYJ-Video-Forge": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Open-source text-to-video and image-to-video app. Static frontend for GitHub Pages, a local backend, and pluggable inference providers. No paid service required."
+    },
+    "syed-visa-expert": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "SAYANJALI NEXUS - Premium Founder Authority Website"
+    },
+    "termux-pro": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "TERMUX ZERO → PRO (Android Dev + Hacking + AI Lab)"
+    },
+    "SAYANJALI-BLOCKCHAIN": {
+      "include": true,
+      "category": "Blockchain",
+      "flagship": 5,
+      "status": "active",
+      "description": "SAYANJALI BLOCKCHAIN is an independently engineered Layer-1 blockchain infrastructure built in Python, combining deterministic Proof-of-Work consensus, native SYJ monetary accounting, cryptographic wallets and transactions, persistent chain storage, authenticated peer-to-peer networking, synchronization, propagation, and scalable multi-node testnet"
+    },
+    "moosavi": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Automation engineer working with n8n, APIs, GitHub Actions, AI agents, and Web3 operations. I design systems that prioritize reliability, observability, and operational clarity."
+    },
+    "KhaledNasser": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Canonical project URL: https://shalimoosavi.github.io/KhaledNasser/"
+    },
+    "SYJ-LaunchPad": {
+      "include": true,
+      "category": "Blockchain",
+      "flagship": 4,
+      "status": "active",
+      "description": "Open-source, self-hosted Web3 LaunchPad for multi-chain token sales, wallet authentication, vesting, claims & fundraising — built with Next.js, FastAPI, PostgreSQL & Solidity."
+    },
+    "SYJ-LLM": {
+      "include": true,
+      "category": "AI",
+      "flagship": 1,
+      "status": "active",
+      "description": "Offline-first LLM runtime in C/C++ for low-RAM devices (~4GB). Built on llama.cpp + GGUF with memory-safe budgeting, no cloud, no API keys. Cross-platform: Windows, Linux, macOS, iOS, Android, WASM. By SAYANJALI NEXUS."
+    },
+    "LawsonAnimalFarm": {
+      "include": true,
+      "category": "Agriculture",
+      "flagship": null,
+      "status": "active",
+      "description": "Production-ready static website for Lawson Animal Farm, Hyderabad. Pure HTML5, CSS3 and vanilla JavaScript. No build step and no backend."
+    },
+    "syj-mail-intelligence-ai": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "AI-powered Gmail intelligence platform that automatically classifies emails, prioritizes messages, generates summaries and smart replies using local LLMs (Ollama), with a FastAPI backend, Next.js dashboard."
+    },
+    "SYJ-Aegis": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Local-first, zero-dependency static analysis for AI agent security & governance — secret detection, prompt-injection and RAG risk scanning, tool permission mapping, and excessive-agency detection, runnable entirely offline and Termux-native."
+    },
+    "Sayanjali-Nexus-CRM": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Local-first, multi-vertical CRM built for Sayanjali Nexus — FastAPI + React + SQLite/Postgres, covering Leads, Clients, Projects (Kanban), Opportunities, and Documents across every business vertical from AI to hospitality to agriculture."
+    },
+    "DevXchange": {
+      "include": false,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "planned",
+      "description": "DevXchange is a public software project by SHalimoosavi. See the repository for current scope and implementation details.",
+      "reason": "Empty repository at the last verified inventory."
+    },
+    "SYJ-HCM": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ-HCM is a Production-grade multi-tenant HCM + ATS platform for employee management, recruitment, careers, secure documents, interviews, and offer management."
+    },
+    "SYJ-EdgeMind": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Private, offline AI for low-memory devices. A lightweight C/C++ runtime built on llama.cpp that runs quantized GGUF models on ~4GB RAM, CPU-only, with zero cloud dependency, no API keys, and no telemetry."
+    },
+    "SYJ-TOKEN": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Official website for the SYJ Token, the planned utility token for SAYANJALI BLOCKCHAIN, an independent Layer-1 network built by SAYANJALI NEXUS PRIVATE LIMITED. A single-file static site — no build step, no framework — d"
+    },
+    "syj-blockchain-web": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "SAYANJALI BLOCKCHAIN is the open-source settlement and identity layer for the SAYANJALI NEXUS ecosystem — connecting AI products, SaaS platforms, and automation tools under one transparent, auditable network. Built by SAYANJALI NEXUS PRIVATE LIMITED."
+    },
+    "SYJ-MINE": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ-MINE is a secure, self-hosted mining infrastructure and fleet orchestration platform that combines RandomX execution, Stratum connectivity, real-time telemetry, power monitoring, lease/fencing coordination, authenticated operator controls, and a web-based control plane for reliable multi-node mining operations."
+    },
+    "SYJ-Mining": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Engineering-first mining software by SAYANJALI NEXUS PRIVATE LIMITED."
+    },
+    "SYJ-EDU": {
+      "include": true,
+      "category": "Apps & Tools",
+      "flagship": null,
+      "status": "active",
+      "description": "Learn Modern Software Engineering by Building Real Projects with Open Source AI."
+    },
+    "SYJ-MeshCat": {
+      "include": true,
+      "category": "Apps & Tools",
+      "flagship": null,
+      "status": "active",
+      "description": "An Android-native, offline Bluetooth Low Energy mesh messenger."
+    },
+    "SYJ-SCHOLAR-AI": {
+      "include": true,
+      "category": "AI & Education",
+      "flagship": 2,
+      "status": "active",
+      "description": "SYJ Scholar AI transforms any PDF into a complete study package — summaries, notes, flashcards, quizzes, and exam prep — all powered by free, open-source AI running entirely on your Android phone through Termux."
+    },
+    "SYJ-Qualify": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "STATUS: CORRECTED SOURCE — previously build-verified on ARM64 Android/Termux; sensor exception-handling fix and Android CPU identification are applied in this package but have NOT yet been re-tested on-device."
+    },
+    "syj-nopager-test": {
+      "include": false,
+      "category": "Test",
+      "flagship": null,
+      "status": "hidden",
+      "description": "Disposable test repository for evaluating the NoPager Design Partner environment.",
+      "reason": "Test repository."
+    },
+    "SYJ-AI-Arena": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Multi-agent AI debate engine for strategic decision analysis."
+    },
+    "SYJ-DayPilot": {
+      "include": true,
+      "category": "Apps & Tools",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ-DayPilot is a public software project by SHalimoosavi. See the repository for current scope and implementation details."
+    },
+    "SYJ-Mad-Scientist-Lab": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Experimental technology mutation engine that combines technologies, domains, constraints, and objectives to generate unusual project ideas — now with a local reactive dashboard."
+    },
+    "SYJ-Nexus-inventory-sync": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "A lightweight, production-ready Micro-ERP for small businesses to track inventory in real time — with shareable per-item QR links so staff can update stock from their phone, no login required."
+    },
+    "termux-pro-app": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "<img width=\"1200\" height=\"475\" alt=\"GHBanner\" src=\"https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6\" /"
+    },
+    "antigravity-awesome-skills": {
+      "include": false,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Installable GitHub library of 1,400+ agentic skills for Claude Code, Cursor, Codex CLI, Gemini CLI, Antigravity, and more. Includes installer CLI, bundles, workflows, and official/community skill collections.",
+      "reason": "Excluded by default curation rule."
+    },
+    "SYJ-Websense-AI": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ-Websense-AI is a public software project by SHalimoosavi. See the repository for current scope and implementation details."
+    },
+    "SYJ-DEPLOY": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ Scholar AI transforms any PDF into a complete study package — summaries, notes, flashcards, quizzes, and exam prep — all powered by free, open-source AI running entirely on your Android phone through Termux."
+    },
+    "SYJ-Github-Optimiser": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Automate your GitHub profile README, repo topics, and releases from any terminal — one command, no browser needed."
+    },
+    "SYJ-AI": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Open-source, local-first autonomous AI software engineering agent — runs offline via Ollama, mobile-ready, from Android to Linux/Windows/macOS."
+    },
+    "LeadForge-web": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "The official landing site for [SYJ LeadForge](https://github.com/SHalimoosavi/SYJ-LeadForge) — an open-source"
+    },
+    "SYJ-Logistics-Fabric": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Logistics-Fabric is an open-source federated logistics data exchange platform that eliminates supply-chain \"Ghost Data\" through decentralized data reconciliation, enabling secure, real-time shipment visibility without centralized data ownership."
+    },
+    "SYJ-LeadForge": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Open-source lead qualification and website opportunity analysis platform for freelancers and agencies. Discover high-value businesses, audit websites, score opportunities, and export actionable leads."
+    },
+    "SYJ-OpenTrade-Logic": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": 7,
+      "status": "active",
+      "description": "Open-source deterministic HTS classification engine implementing GRI rules with explainable decision logic for international trade compliance."
+    },
+    "SYJ-Property-Sync": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ PropertySync — a proprietary property listing synchronization and automation platform for real-estate businesses, featuring multi-source connectors, normalization, validation, duplicate detection, analytics, audit trails, multilingual UI, and workflow simulation."
+    },
+    "QuickStock": {
+      "include": true,
+      "category": "Automation & Finance",
+      "flagship": null,
+      "status": "active",
+      "description": "The marketing/landing website for [QuickStock Sync](https://github.com/SHalimoosavi/SYJ-QuickStock-Sync) — a free, open-source, offline-first inventory management platform."
+    },
+    "SYJ-Autonomous-Enterprise-OS": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ Autonomous Enterprise OS (SAEOS) — Phase 1 → 9"
+    },
+    "SYJ-QuickStock-Sync": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "Offline-first inventory management for small businesses — barcode/QR scanning, multi-location stock, suppliers, purchase orders, CSV/Excel, reports, PWA, authentication & LAN/cloud sync. Open source, private by design."
+    },
+    "SYJ-Gridsync-Os": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Industrial Edge Middleware for Grid Synchronization, Telemetry Ingestion, Safety Validation, Durable Command Processing, and Distributed Energy Resource Orchestration. Built with Node.js and designed for production-ready energy systems."
+    },
+    "Me": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "<img src=\"https://capsule-render.vercel.app/api?type=waving&color=0:08080B,100:6D5EF0&height=200&section=header&text=Syed%20Ali%20Hasan%20Moosavi&fontSize=42&fontColor=EDEBE2&fontAlignY=38&desc=AI%20Engineer%20%C2%B7%20F"
+    },
+    "SYJ-TalentFlow-Cli-Web": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "The official landing page for SYJ TalentFlow CLI, built as a zero-dependency static site: plain HTML5, CSS3, and vanilla JavaScript (ES modules). No framework, no bundler, no npm install, no build step — open index.html and it works."
+    },
+    "SYJ-bitchat": {
+      "include": false,
+      "category": "Apps & Tools",
+      "flagship": null,
+      "status": "active",
+      "description": "<img width=\"256\" height=\"256\" alt=\"icon128x128@2x\" src=\"https://github.com/user-attachments/assets/90133f83-b4f6-41c6-aab9-25d0859d2a47\" /",
+      "reason": "Excluded by default curation rule."
+    },
+    "SHalimoosavi": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Founder · CTO · Managing Director · SAYANJALI NEXUS PRIVATE LIMITED"
+    },
+    "SYJ-CanvasForge": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ-CanvasForge is a modern, browser-based PDF, image, and document editor built with React, TypeScript, Vite, PDF.js, pdf-lib, and Fabric.js. Edit PDFs, annotate documents, manipulate images, and process DOCX/TXT files entirely in your browser with a privacy-first, client-side architecture."
+    },
+    "SYJ-TalentFlow-Cli": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ TalentFlow CLI is an open-source AI-powered recruitment automation toolkit that intelligently parses resumes, matches candidates to job descriptions, generates interview questions, creates recruiter email templates, and produces professional hiring reports. Built with Node.js, it runs on Windows, Linux, macOS, and ANDROID Termux"
+    },
+    "Syj-Voice-Asistant": {
+      "include": true,
+      "category": "Apps & Tools",
+      "flagship": null,
+      "status": "active",
+      "description": "A fully local, offline voice assistant for Android — built to run entirely inside Termux with no cloud dependency."
+    },
+    "fix-task-broken": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "fix-task-broken is a public software project by SHalimoosavi. See the repository for current scope and implementation details."
+    },
+    "SYJ-Educate": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ EDUCATE is an open-source software engineering learning platform that teaches modern backend development, AI engineering, cybersecurity, OSINT, automation, SaaS architecture, and real-world application development through production-quality projects powered by open-source AI."
+    },
+    "SYJ-Nexus-Sentinel-Audit": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Lightweight, open-source security observability daemon that tracks local network devices via ARP/IP monitoring, flags unknown devices against a whitelist, and generates daily audit reports. Zero native binaries — pure TypeScript, runs on Linux, Windows, and Termux."
+    },
+    "SYJ-Nexus-Engine": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "Headless, API-first, configuration-driven enterprise operating framework. Bring Your Own Vertical (BYOV) — add an industry by editing a JSON file, never the backend code. Next.js 14 · Drizzle ORM · SQLite · Zod · RBAC · zero external services."
+    },
+    "SYJ-Nexus-Shadow-Sync": {
+      "include": true,
+      "category": "Security & OSINT",
+      "flagship": null,
+      "status": "active",
+      "description": "Lightweight, cross-platform file monitoring & snapshot daemon. Zero native dependencies, built on node:sqlite + Drizzle ORM. Watches directories, tracks state, and mirrors dev context across machines via local-first .nexus snapshots. Runs on Linux, Windows, and Android/Termux."
+    },
+    "SYJ-Nexus-Event-Trace": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "Lightweight, local-first webhook event sink & logger. Captures, verifies, stores, and replays webhooks in SQLite — zero native binaries, runs on Linux, Windows, and Android/Termux. A self-hosted \"Black Box\" for debugging distributed systems."
+    },
+    "SYJ-NexusIntel-AI-web": {
+      "include": true,
+      "category": "AI & SaaS",
+      "flagship": 3,
+      "status": "active",
+      "description": "Enterprise Business Intelligence & Autonomous Revenue Intelligence Platform"
+    },
+    "SYJ-AI-Landing": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Open-source, local-first autonomous AI software engineering agent — runs offline via Ollama, mobile-ready, from Android to Linux/Windows/macOS."
+    },
+    "SYJ-Calling-CRM": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "Lightweight, open-source CRM for tracking leads and calls. Node.js, Express, Next.js, TypeScript, Prisma/SQLite. Built by SAYANJALI NEXUS PRIVATE LIMITED."
+    },
+    "SAYANJALI_NEXUS": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Official corporate website for SAYANJALI NEXUS PRIVATE LIMITED, founded and led by Syed Ali Hasan Moosavi. A single-file static site — no build step, no framework — deployed on GitHub Pages"
+    },
+    "Zara-ig-bot": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Zara automatically replies to every Instagram DM using Claude AI — qualifying leads, booking appointments, and handling support 24/7."
+    },
+    "RealEstate-sales-ai-agent": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "RealEstate-sales-ai-agent is a public software project by SHalimoosavi. See the repository for current scope and implementation details."
+    },
+    "Understand-Anything": {
+      "include": false,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Graphs that teach > graphs that impress. Turn any code into an interactive knowledge graph you can explore, search, and ask questions about. Works with Claude Code, Codex, Cursor, Copilot, Gemini CLI, and more.",
+      "reason": "Excluded by default curation rule."
+    },
+    "syed-ali-hasan-moosavi": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "AI Portfolio"
+    },
+    "portfolio-os": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Ultra-premium founder portfolio for Syed Ali Hasan Moosavi, Founder &amp; Managing Director of SAYANJALI NEXUS PRIVATE LIMITED."
+    },
+    "nexusrank-ai": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [create-next-app](https://nextjs.org/docs/app/api-reference/cli/create-next-app)."
+    },
+    "BBGNexusAI": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "AI Sales Agent"
+    },
+    "local-business-leads": {
+      "include": true,
+      "category": "SaaS & Business",
+      "flagship": null,
+      "status": "active",
+      "description": "local-business-leads is a public software project by SHalimoosavi. See the repository for current scope and implementation details."
+    },
+    "syj-one": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ ONE is an open-source, all-in-one productivity · business · developer · SEO · security platform built specifically for Termux on Android. Instead of juggling a dozen separate tools, you get a single unified platform that handles everything — from website SEO audits to invoice generation, from DNS reconnaissance to AI-powered content"
+    },
+    "nexusrank-ai-V-1.0": {
+      "include": false,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "NexusRank AI empowers business and agencies with AI-driven  SEO intelligence, analytics, automation nd growth-focuse insights",
+      "reason": "Excluded by default curation rule."
+    },
+    "AI-Zara-web-widget": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Zara is an AI-powered floating chat bubble you can embed in any website — GitHub Pages, WordPress, Wix, Shopify, or plain HTML — with a single copy-paste. No npm, no React, no build pipeline, no backend required for demos."
+    },
+    "sayanjali-osint": {
+      "include": true,
+      "category": "Security & OSINT",
+      "flagship": 6,
+      "status": "active",
+      "description": "SAYANJALI OSINT is a lightweight yet powerful OSINT geolocation framework designed for Android Termux environments."
+    },
+    "sayanjali-wisdom-14": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Akhbari Shia Hadith Platform — sourced exclusively from the 14 Infallibles (Prophet Muhammad ﷺ, Sayyida Fatimah Zahra ؑ, and the 12 Imams), via the Hugging Face Inference API (Qwen QwQ-32B / DeepSeek)."
+    },
+    "SYJ-Personality-For-Github": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "SYJ Personality From GitHub analyzes a developer's public GitHub profile and generates a rich, data-driven personality report — complete with archetype detection, radar charts, repository insights, and a shareable identity card. No survey, no self-reporting. Just a GitHub username."
+    },
+    "Shadowbroker": {
+      "include": false,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "Open-source intelligence for the global theater. Track everything from the corporate/private jets of the wealthy, and spy satellites, to seismic events in one unified interface. Hook an AI agent up to have it parse through data and find previously unseen correlations. The knowledge is available to all but rarely aggregated in the open, until now.",
+      "reason": "Excluded by default curation rule."
+    },
+    "SYJ-GST-Reconciliation": {
+      "include": true,
+      "category": "Automation & Finance",
+      "flagship": 8,
+      "status": "active",
+      "description": "Offline GST Invoice Reconciliation Tool for Indian SMEs, CAs & Accountants. Built with Python. Works on Android (Termux), Windows, Linux and macOS."
+    },
+    "SYJ-FarmOwner": {
+      "include": true,
+      "category": "Agriculture",
+      "flagship": null,
+      "status": "active",
+      "description": "Transparent agricultural labour management for Portugal — connecting Farm Owners, Labour Contractors, and Agricultural Workers with GPS-verified attendance, visible payment splits, and worker performance scoring."
+    },
+    "SYJ-InstaRecon": {
+      "include": false,
+      "category": "Security & OSINT",
+      "flagship": null,
+      "status": "active",
+      "description": "🔍 Professional Instagram OSINT tool for penetration testing and security research. Gather public information ethically for authorized security assessments.",
+      "reason": "Excluded by default curation rule."
+    },
+    "freellmapi": {
+      "include": false,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "OpenAI-compatible proxy that aggregates free-tier keys from ~14 AI providers with automatic failover. For personal experimentation only.",
+      "reason": "Excluded by default curation rule."
+    },
+    "Moosavi-Compliance-Agro": {
+      "include": true,
+      "category": "Agriculture",
+      "flagship": null,
+      "status": "active",
+      "description": "Office web repo for Moosavi Agro Farm"
+    },
+    "alisonholidays": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Test Web Repo for Alison Holidays"
+    },
+    "Zara_ai_agent": {
+      "include": true,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "A React-based AI chat agent that simulates a professional voice assistant interface, powered by Claude (Anthropic API). Designed for demos, websites, and internal tools."
+    },
+    "podcaster_crew": {
+      "include": false,
+      "category": "AI",
+      "flagship": null,
+      "status": "active",
+      "description": "This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.",
+      "reason": "Excluded by default curation rule."
+    },
+    "Portfolio": {
+      "include": true,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "Portfolio For Syed"
+    },
+    "Rajkumardusad-": {
+      "include": false,
+      "category": "Software Engineering",
+      "flagship": null,
+      "status": "active",
+      "description": "[![Build Status](https://img.shields.io/github/forks/rajkumardusad/Tool-X.svg)](https://github.com/rajkumardusad/Tool-X)",
+      "reason": "Excluded by default curation rule."
+    },
+    "SAYANJALI-NEXUS": {
+      "include": false,
+      "category": "Company",
+      "flagship": null,
+      "status": "empty",
+      "description": "SAYANJALI-NEXUS is a public software project by SHalimoosavi. See the repository for current scope and implementation details.",
+      "reason": "Empty repository."
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "syj-labs",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "build:previews": "node scripts/generate-previews.mjs",
+    "validate:html": "html-validate \"dist/**/*.html\"",
+    "validate:a11y": "start-server-and-test \"serve:dist\" http://127.0.0.1:4173/SYJ-Labs/ \"pa11y http://127.0.0.1:4173/SYJ-Labs/ --standard WCAG2AA\"",
+    "validate:links": "start-server-and-test \"serve:dist\" http://127.0.0.1:4173/SYJ-Labs/ \"linkinator http://127.0.0.1:4173/SYJ-Labs/ --recurse --silent\"",
+    "serve:dist": "http-server dist -p 4173 -c-1",
+    "ci:build": "npm run build && npm run validate:html"
+  },
+  "devDependencies": {
+    "@lhci/cli": "0.15.1",
+    "html-validate": "11.16.2",
+    "linkinator": "7.5.0",
+    "pa11y": "9.0.0",
+    "sharp": "0.33.5",
+    "start-server-and-test": "2.0.8",
+    "http-server": "14.1.1"
+  }
+}
