@@ -1,0 +1,84 @@
+# SYJ LABS
+
+SYJ LABS is the independent technology lab of Syed Ali Hasan Moosavi. It documents practical AI, blockchain, software and automation projects.
+
+Website: https://shalimoosavi.github.io/SYJ-Labs/
+Founder: https://shalimoosavi.github.io/moosavi/
+GitHub: https://github.com/SHalimoosavi
+
+Projects (75):
+- SYJ-LLM | AI | C++ | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-llm/
+- SYJ-SCHOLAR-AI | AI & Education | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-scholar-ai/
+- SYJ-NexusIntel-AI-web | AI & SaaS | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-nexusintel-ai-web/
+- SYJ-LaunchPad | Blockchain | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-launchpad/
+- SAYANJALI-BLOCKCHAIN | Blockchain | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/sayanjali-blockchain/
+- sayanjali-osint | Security & OSINT | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/sayanjali-osint/
+- SYJ-OpenTrade-Logic | Software Engineering | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-opentrade-logic/
+- SYJ-GST-Reconciliation | Automation & Finance | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-gst-reconciliation/
+- AI-Zara-web-widget | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/ai-zara-web-widget/
+- alisonholidays | Software Engineering | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/alisonholidays/
+- BBGNexusAI | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/bbgnexusai/
+- fix-task-broken | Software Engineering | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/fix-task-broken/
+- KhaledNasser | Software Engineering | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/khalednasser/
+- LawsonAnimalFarm | Agriculture | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/lawsonanimalfarm/
+- LeadForge-web | SaaS & Business | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/leadforge-web/
+- local-business-leads | SaaS & Business | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/local-business-leads/
+- Me | Software Engineering | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/me/
+- moosavi | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/moosavi/
+- Moosavi-Compliance-Agro | Agriculture | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/moosavi-compliance-agro/
+- nexusrank-ai | AI | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/nexusrank-ai/
+- Portfolio | Software Engineering | JavaScript | https://shalimoosavi.github.io/SYJ-Labs/projects/portfolio/
+- portfolio-os | Software Engineering | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/portfolio-os/
+- QuickStock | Automation & Finance | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/quickstock/
+- RealEstate-sales-ai-agent | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/realestate-sales-ai-agent/
+- SAYANJALI_NEXUS | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/sayanjali-nexus/
+- Sayanjali-Nexus-CRM | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/sayanjali-nexus-crm/
+- sayanjali-wisdom-14 | Software Engineering | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/sayanjali-wisdom-14/
+- SHalimoosavi | Software Engineering | Other | https://shalimoosavi.github.io/SYJ-Labs/projects/shalimoosavi/
+- syed-ali-hasan-moosavi | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syed-ali-hasan-moosavi/
+- syed-visa-expert | Software Engineering | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syed-visa-expert/
+- SYJ-Aegis | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-aegis/
+- SYJ-AI | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-ai/
+- SYJ-AI-Arena | AI | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-ai-arena/
+- SYJ-AI-Landing | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-ai-landing/
+- SYJ-Autonomous-Enterprise-OS | SaaS & Business | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-autonomous-enterprise-os/
+- syj-blockchain-web | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-blockchain-web/
+- SYJ-Calling-CRM | SaaS & Business | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-calling-crm/
+- SYJ-CanvasForge | Software Engineering | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-canvasforge/
+- SYJ-DayPilot | Apps & Tools | Kotlin | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-daypilot/
+- SYJ-DEPLOY | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-deploy/
+- SYJ-EdgeMind | AI | C++ | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-edgemind/
+- SYJ-EDU | Apps & Tools | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-edu/
+- SYJ-Educate | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-educate/
+- SYJ-FarmOwner | Agriculture | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-farmowner/
+- SYJ-Github-Optimiser | Software Engineering | JavaScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-github-optimiser/
+- SYJ-Gridsync-Os | Software Engineering | JavaScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-gridsync-os/
+- SYJ-HCM | SaaS & Business | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-hcm/
+- SYJ-Labs | Software Engineering | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-labs/
+- SYJ-LeadForge | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-leadforge/
+- SYJ-Logistics-Fabric | AI | Go | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-logistics-fabric/
+- SYJ-Mad-Scientist-Lab | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-mad-scientist-lab/
+- syj-mail-intelligence-ai | AI | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-mail-intelligence-ai/
+- SYJ-MeshCat | Apps & Tools | Kotlin | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-meshcat/
+- SYJ-MINE | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-mine/
+- SYJ-Mining | Software Engineering | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-mining/
+- SYJ-Nexus-Engine | SaaS & Business | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-nexus-engine/
+- SYJ-Nexus-Event-Trace | SaaS & Business | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-nexus-event-trace/
+- SYJ-Nexus-inventory-sync | SaaS & Business | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-nexus-inventory-sync/
+- SYJ-Nexus-Sentinel-Audit | AI | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-nexus-sentinel-audit/
+- SYJ-Nexus-Shadow-Sync | Security & OSINT | JavaScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-nexus-shadow-sync/
+- syj-one | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-one/
+- SYJ-Personality-For-Github | Software Engineering | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-personality-for-github/
+- SYJ-Property-Sync | AI | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-property-sync/
+- SYJ-Qualify | Software Engineering | C++ | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-qualify/
+- SYJ-QuickStock-Sync | SaaS & Business | JavaScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-quickstock-sync/
+- SYJ-TalentFlow-Cli | AI | JavaScript | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-talentflow-cli/
+- SYJ-TalentFlow-Cli-Web | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-talentflow-cli-web/
+- SYJ-TOKEN | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-token/
+- SYJ-Video-Forge | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-video-forge/
+- Syj-Voice-Asistant | Apps & Tools | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-voice-asistant/
+- SYJ-Websense-AI | AI | Python | https://shalimoosavi.github.io/SYJ-Labs/projects/syj-websense-ai/
+- termux-pro | AI | HTML | https://shalimoosavi.github.io/SYJ-Labs/projects/termux-pro/
+- termux-pro-app | Software Engineering | TypeScript | https://shalimoosavi.github.io/SYJ-Labs/projects/termux-pro-app/
+- Zara_ai_agent | AI | JavaScript | https://shalimoosavi.github.io/SYJ-Labs/projects/zara-ai-agent/
+- Zara-ig-bot | Software Engineering | JavaScript | https://shalimoosavi.github.io/SYJ-Labs/projects/zara-ig-bot/
