@@ -59,6 +59,28 @@ jobs:
 
       - run: sleep 2 && npx --yes linkinator http://127.0.0.1:4173/SYJ-Labs/ --recurse --silent
 
+      - name: Check responsive widths and capture screenshots
+        env:
+          SCREENSHOT_DIR: ${{ runner.temp }}/syj-labs-responsive
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHROME_BIN="$(find "$HOME/.cache/puppeteer" -type f -name chrome -print -quit)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "ERROR: Puppeteer Chrome executable was not found."
+            exit 1
+          fi
+          export CHROME_BIN
+          node scripts/verify-responsive.mjs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: syj-labs-responsive-screenshots
+          path: ${{ runner.temp }}/syj-labs-responsive/
+          if-no-files-found: warn
+
+
   accessibility:
     runs-on: ubuntu-latest
     needs: static
