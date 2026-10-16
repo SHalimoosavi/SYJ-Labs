@@ -6,7 +6,25 @@
         "http://127.0.0.1:4173/projects/index.html"
       ],
       "numberOfRuns": 3,
-      "settings": { "preset": "mobile" }
+      "settings": {
+        "formFactor": "mobile",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 375,
+          "height": 812,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1600,
+          "requestLatencyMs": 150,
+          "downloadThroughputKbps": 1600,
+          "uploadThroughputKbps": 750,
+          "cpuSlowdownMultiplier": 4
+        },
+        "chromeFlags": ["--no-sandbox", "--disable-dev-shm-usage"]
+      }
     },
     "assert": {
       "assertions": {
