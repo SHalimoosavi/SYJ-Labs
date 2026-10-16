@@ -364,6 +364,7 @@ function curate(repo, curation) {
     repo.fork ||
     repo.archived ||
     repo.size === 0 ||
+    /termux/i.test(repo.name) ||
     isObviousTest(repo);
 
   return {
@@ -399,7 +400,12 @@ function curate(repo, curation) {
       ),
 
     description:
-      override.description || ''
+      override.description || '',
+
+    homepage:
+      Object.prototype.hasOwnProperty.call(override, 'homepage')
+        ? override.homepage
+        : undefined
   };
 }
 
@@ -420,6 +426,7 @@ async function ensureCuration(repos, curation) {
       description:
         c.description ||
         await readmeDescription(repo),
+      ...(c.homepage !== undefined ? { homepage: c.homepage } : {}),
       ...(c.reason
         ? { reason: c.reason }
         : {})
@@ -427,9 +434,6 @@ async function ensureCuration(repos, curation) {
   }
 
   const output = {
-    generatedAt:
-      new Date().toISOString(),
-
     _defaults:
       curation._defaults ||
       {
@@ -437,24 +441,19 @@ async function ensureCuration(repos, curation) {
         category: 'Software Engineering',
         status: 'active'
       },
-
-    overrides:
-      curation.overrides || {},
-
+    overrides: curation.overrides || {},
     repositories: entries
   };
 
-  await write(
-    path.join(
-      ROOT,
-      'data/curation.json'
-    ),
-    JSON.stringify(
-      output,
-      null,
-      2
-    ) + '\n'
-  );
+  const curationFile = path.join(ROOT, 'data/curation.json');
+  const outputText = JSON.stringify(output, null, 2) + '\n';
+  let currentText;
+  try {
+    currentText = await fs.readFile(curationFile, 'utf8');
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
+  if (currentText !== outputText) await write(curationFile, outputText);
 
   return entries;
 }
@@ -687,7 +686,7 @@ function layout({
 <meta name="description" content="${esc(description)}">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="canonical" href="${esc(canonical)}">
-<link rel="icon" href="${BASE}assets/syj-labs-logo.png">
+<link rel="icon" href="${BASE}assets/syj-labs-logo-64.png">
 <link rel="preload" as="font" type="font/woff2" href="${BASE}assets/fonts/lato-medium.woff2" crossorigin>
 <link rel="stylesheet" href="${BASE}assets/site.css">
 
@@ -858,8 +857,7 @@ const projects =
         'Other',
 
       topics:
-        repo.topics ||
-        [],
+        (repo.topics || []).filter(topic => !/termux|mobile-first/i.test(topic)),
 
       stars:
         repo.stargazers_count ||
@@ -880,8 +878,9 @@ const projects =
         0,
 
       homepage:
-        repo.homepage ||
-        '',
+        c.homepage !== undefined
+          ? c.homepage
+          : (repo.homepage || ''),
 
       license:
         repo.license?.spdx_id ||
@@ -922,22 +921,20 @@ const projects =
     };
   });
 
-await write(
-  path.join(
-    ROOT,
-    'data/projects.json'
-  ),
-  JSON.stringify(
-    {
-      generatedAt:
-        new Date().toISOString(),
-
-      projects
-    },
-    null,
-    2
-  ) + '\n'
-);
+const projectsFile = path.join(ROOT, 'data/projects.json');
+const projectsText = JSON.stringify({ projects }, null, 2) + '\n';
+let existingProjectsText;
+try {
+  existingProjectsText = await fs.readFile(projectsFile, 'utf8');
+} catch (error) {
+  if (error.code !== 'ENOENT') throw error;
+}
+if (existingProjectsText !== projectsText) {
+  await write(projectsFile, projectsText);
+  console.log('data/projects.json: updated');
+} else {
+  console.log('data/projects.json: unchanged');
+}
 
 await fs.rm(
   DIST,
@@ -978,31 +975,33 @@ await fs.cp(
   }
 );
 
-for (
-  const file of [
-    'syj-labs-logo.png',
-    'founder-photo.webp',
-    'youtube-qr.png'
-  ]
-) {
-  const src =
-    path.join(
-      ROOT,
-      'assets',
-      file
-    );
-
+for (const file of ['founder-photo.webp', 'site.css', 'site.js']) {
+  const source = path.join(ROOT, 'assets', file);
+  const destination = path.join(DIST, 'assets', file);
   try {
-    await fs.copyFile(
-      src,
-      path.join(
-        DIST,
-        'assets',
-        file
-      )
-    );
-  } catch {}
+    await fs.access(source);
+    await fs.mkdir(path.dirname(destination), { recursive: true });
+    await fs.copyFile(source, destination);
+  } catch (error) {
+    throw new Error(`Required asset copy failed for ${source}: ${error.message}`);
+  }
 }
+
+const logoSource = path.join(ROOT, 'assets', 'syj-labs-logo.png');
+const logoTarget = path.join(DIST, 'assets', 'syj-labs-logo-64.png');
+try {
+  await fs.access(logoSource);
+  await new Promise((resolve, reject) => {
+    const child = spawn(IMAGEMAGICK, [logoSource, '-thumbnail', '64x64', '-strip', '-define', 'png:compression-level=9', logoTarget], {stdio:['ignore','ignore','pipe']});
+    let errorText = '';
+    child.stderr.on('data', chunk => { errorText += chunk.toString(); });
+    child.on('error', reject);
+    child.on('close', code => code === 0 ? resolve() : reject(new Error(errorText || `ImageMagick exited ${code}`)));
+  });
+} catch (error) {
+  throw new Error(`Required logo optimization failed for ${logoSource}: ${error.message}`);
+}
+console.log('Required assets copied; logo optimized to 64px; unused YouTube QR omitted.');
 
 await fs.mkdir(
   path.join(
@@ -1059,109 +1058,28 @@ console.log(
   `Flagship projects: ${flagship.length}`
 );
 
-for (
-  const p of included
-) {
-  const previewDir =
-    path.join(
-      ROOT,
-      'assets',
-      'projects'
-    );
-
-  await makePreview(
-    p,
-    curated[p.name],
-    path.join(
-      previewDir,
-      `${p.slug}.png`
-    )
-  );
-
-  const destDir =
-    path.join(
-      DIST,
-      'assets',
-      'projects'
-    );
-
-  await fs.mkdir(
-    destDir,
-    {
-      recursive: true
-    }
-  );
-
-  await new Promise(
-    (resolve, reject) => {
-      const child =
-        spawn(
-          IMAGEMAGICK,
-          [
-            path.join(
-              previewDir,
-              `${p.slug}.png`
-            ),
-            '-strip',
-            '-quality',
-            '82',
-            `webp:${path.join(
-              destDir,
-              `${p.slug}.webp`
-            )}`
-          ],
-          {
-            stdio: [
-              'ignore',
-              'ignore',
-              'pipe'
-            ]
-          }
-        );
-
-      let err = '';
-
-      child.stderr.on(
-        'data',
-        c => {
-          err +=
-            c.toString();
-        }
-      );
-
-      child.on(
-        'error',
-        reject
-      );
-
-      child.on(
-        'close',
-        code => {
-          if (code === 0) {
-            resolve();
-          } else {
-            reject(
-              new Error(
-                err ||
-                `ImageMagick exited ${code}`
-              )
-            );
-          }
-        }
-      );
-    }
-  );
-
-  await fs.copyFile(
-    path.join(
-      previewDir,
-      `${p.slug}.png`
-    ),
-    path.join(
-      destDir,
-      `${p.slug}.png`
-    )
-  );
+for (const p of included) {
+  const sourcePreview = path.join(ROOT, 'assets', 'projects', `${p.slug}.png`);
+  const destDir = path.join(DIST, 'assets', 'projects');
+  const distPng = path.join(destDir, `${p.slug}.png`);
+  const distWebp = path.join(destDir, `${p.slug}.webp`);
+  await fs.mkdir(destDir, { recursive: true });
+  let previewInput = sourcePreview;
+  try {
+    await fs.access(sourcePreview);
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+    previewInput = distPng;
+    await makePreview(p, curated[p.name], previewInput);
+  }
+  if (previewInput !== distPng) await fs.copyFile(previewInput, distPng);
+  await new Promise((resolve, reject) => {
+    const child = spawn(IMAGEMAGICK, [previewInput, '-strip', '-quality', '82', `webp:${distWebp}`], {stdio:['ignore','ignore','pipe']});
+    let errorText = '';
+    child.stderr.on('data', chunk => { errorText += chunk.toString(); });
+    child.on('error', reject);
+    child.on('close', code => code === 0 ? resolve() : reject(new Error(errorText || `ImageMagick exited ${code} generating ${distWebp}`)));
+  });
 }
 
 const org = {
@@ -1171,7 +1089,7 @@ const org = {
   name: 'SYJ LABS',
   url: SITE,
   logo:
-    `${SITE}assets/syj-labs-logo.png`,
+    `${SITE}assets/syj-labs-logo-64.png`,
   description:
     'A technology lab focused on practical AI tools, blockchain engineering, software development and automation.',
   sameAs: [

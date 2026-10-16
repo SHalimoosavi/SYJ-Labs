@@ -5,3 +5,17 @@
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.hero-glow{animation:none}.reveal,.reveal.is-visible{opacity:1;transform:none;transition:none}.button:hover,.card:hover{transform:none}}
 @supports (animation-timeline:view()){.reveal{animation:reveal-in linear both;animation-timeline:view();animation-range:entry 0% cover 25%}.reveal.is-visible{animation:none}}@keyframes reveal-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 @view-transition{navigation:auto}
+
+/* Accessible focus and restrained motion refinements */
+:where(a,button,input,select,textarea,[tabindex]):focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+:where(button,input,select,textarea){font:inherit}button{cursor:pointer}
+.site-header,.hero,.section,.catalogue-head,.catalogue-tools,.catalogue-grid,.project-hero,.project-detail,footer{min-width:0}
+html,body{max-width:100%}body{overflow-x:clip}
+.hero-copy{animation:hero-enter .55s ease-out both}
+@keyframes hero-enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.card{transition:transform .2s ease,opacity .22s ease}.card:hover{transform:translateY(-4px)}
+.catalogue-grid.is-filtering{opacity:.45;transform:translateY(3px)}.catalogue-grid{transition:opacity .14s ease,transform .14s ease}
+.founder img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover}.project-detail>picture{min-width:0}.project-detail img{display:block;height:auto}
+@media(max-width:560px){.hero h1,.catalogue-head h1,.project-hero h1{overflow-wrap:anywhere}.hero-bottom{gap:12px;flex-wrap:wrap}.project-detail dl div{grid-template-columns:minmax(90px,34%) minmax(0,1fr);gap:12px}.site-header{gap:10px}.brand{min-width:0}.brand strong{font-size:14px}}
+@media(max-width:360px){.hero h1,.catalogue-head h1,.project-hero h1{font-size:clamp(38px,12vw,46px)}.hero,.section,.catalogue-head,.project-hero,.project-detail{padding-left:14px;padding-right:14px}.actions .button{max-width:100%}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.hero-copy{animation:none}.catalogue-grid,.card,.button{transform:none!important}}

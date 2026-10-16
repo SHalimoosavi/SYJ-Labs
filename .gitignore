@@ -14,3 +14,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Generated GitHub Pages output (built in CI)
+dist/

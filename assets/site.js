@@ -32,7 +32,11 @@
   const status = document.querySelector('#catalogue-status');
   if (!grid || !search || !cat || !lang || !sort) return;
   const cards = [...grid.querySelectorAll('.card')];
+  let filterTimer;
   const apply = () => {
+    grid.classList.add('is-filtering');
+    clearTimeout(filterTimer);
+    filterTimer = setTimeout(() => grid.classList.remove('is-filtering'), 140);
     const q = search.value.trim().toLowerCase();
     const category = cat.value;
     const language = lang.value;

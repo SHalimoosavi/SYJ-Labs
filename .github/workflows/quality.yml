@@ -32,6 +32,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      - run: npm run verify:dist
+
+      - name: Prove missing CSS fails verification, then rebuild
+        shell: bash
+        run: |
+          set -euo pipefail
+          saved="${RUNNER_TEMP}/site.css"
+          mv dist/assets/site.css "$saved"
+          if npm run verify:dist; then
+            mv "$saved" dist/assets/site.css
+            echo "ERROR: verifier passed while required CSS was missing."
+            exit 1
+          else
+            echo "EXPECTED FAILURE: verifier rejected the missing stylesheet."
+          fi
+          mv "$saved" dist/assets/site.css
+          npm run build
+          npm run verify:dist
+
       - run: npm run validate:html
 
       - run: ln -s . dist/SYJ-Labs
@@ -61,6 +80,8 @@ jobs:
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      - run: npm run verify:dist
 
       - run: ln -s . dist/SYJ-Labs
 
@@ -93,6 +114,8 @@ jobs:
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      - run: npm run verify:dist
 
       - run: ln -s . dist/SYJ-Labs
 

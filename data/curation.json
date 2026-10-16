@@ -1,5 +1,4 @@
 {
-  "generatedAt": "2026-10-14T13:09:11.240Z",
   "_defaults": {
     "include": true,
     "category": "Software Engineering",
@@ -16,7 +15,8 @@
       "include": true,
       "category": "AI & Education",
       "flagship": 2,
-      "status": "active"
+      "status": "active",
+      "description": "SYJ Scholar AI turns PDF documents into study materials, including summaries, structured notes, flashcards, quizzes, and revision questions, using open-source AI models that can run locally."
     },
     "SYJ-NexusIntel-AI-web": {
       "include": true,
@@ -40,7 +40,8 @@
       "include": true,
       "category": "Security & OSINT",
       "flagship": 6,
-      "status": "active"
+      "status": "active",
+      "description": "SAYANJALI OSINT is an open-source intelligence toolkit for authorized security research. It collects and enriches public indicators, correlates results from supported sources, and produces structured investigation reports."
     },
     "SYJ-OpenTrade-Logic": {
       "include": true,
@@ -52,7 +53,8 @@
       "include": true,
       "category": "Automation & Finance",
       "flagship": 8,
-      "status": "active"
+      "status": "active",
+      "description": "SYJ GST Invoice Reconciliation compares supplier invoices with purchase records, validates invoice fields, identifies duplicates and mismatches, and generates structured Excel reports for review."
     },
     "DevXchange": {
       "include": false,
@@ -71,6 +73,70 @@
       "category": "Test",
       "status": "hidden",
       "reason": "Test repository."
+    },
+    "SYJ-Aegis": {
+      "description": "SYJ-Aegis is a local static-analysis tool for AI-agent security and governance. It checks source files and workflows for exposed secrets, prompt-injection risks, retrieval access issues, and tool-permission concerns."
+    },
+    "SYJ-Qualify": {
+      "description": "SYJ-Qualify is a C++ device-measurement utility for CPU and architecture identification, benchmark timing, and optional local sensor readings. Target-machine runtime verification is still required."
+    },
+    "SYJ-DEPLOY": {
+      "description": "SYJ Deploy is a self-hosted application deployment platform. It can fetch a Git repository, detect common project stacks, install dependencies, build applications, and expose deployment logs in a web dashboard."
+    },
+    "SYJ-TalentFlow-Cli": {
+      "description": "SYJ TalentFlow CLI is an open-source recruitment automation toolkit for parsing resumes, matching candidates to job descriptions, generating interview questions, drafting recruiter emails, and preparing hiring reports."
+    },
+    "Syj-Voice-Asistant": {
+      "description": "SYJ Voice Assistant combines offline speech recognition, a local language model, and text-to-speech to provide a private voice interface on supported Android devices."
+    },
+    "SYJ-Nexus-Sentinel-Audit": {
+      "description": "SYJ Nexus Sentinel Audit is an open-source security observability tool that monitors local network devices, flags unfamiliar devices against an allowlist, and produces audit reports."
+    },
+    "SYJ-Nexus-Shadow-Sync": {
+      "description": "SYJ Nexus Shadow Sync watches selected project directories and writes local JSON snapshots of file and development state, allowing context to be inspected or synchronized across machines."
+    },
+    "SYJ-Nexus-Event-Trace": {
+      "description": "SYJ Nexus Event Trace is a local webhook receiver and debugging utility that captures incoming events, optionally verifies signatures, stores payloads in SQLite, and supports inspection and replay."
+    },
+    "SYJ-AI": {
+      "description": "SYJ AI is an open-source software engineering agent that uses local models through Ollama to plan coding tasks, generate changes, and support review, testing, and documentation across supported operating systems."
+    },
+    "SYJ-AI-Landing": {
+      "description": "SYJ AI is an open-source software engineering agent that uses local models through Ollama to plan coding tasks, generate changes, and support review, testing, and documentation across supported operating systems."
+    },
+    "syj-one": {
+      "description": "SYJ ONE is an open-source collection of productivity, business, development, SEO, and security utilities, including website audits, invoice tools, DNS research, and AI-assisted content workflows.",
+      "homepage": ""
+    },
+    "SYJ-Autonomous-Enterprise-OS": {
+      "description": "SYJ Autonomous Enterprise OS is a configurable software framework intended to organize business workflows and applications across multiple operational areas."
+    },
+    "SYJ-Github-Optimiser": {
+      "description": "SYJ Github Optimiser automates maintenance tasks for a GitHub profile and repositories, including README content, repository topics, and release workflows.",
+      "homepage": ""
+    },
+    "SYJ-Nexus-Engine": {
+      "description": "SYJ Nexus Engine is a configuration-driven, API-oriented application framework for composing business-specific workflows with shared authentication, data validation, and storage."
+    },
+    "termux-pro": {
+      "include": false,
+      "category": "Apps & Tools",
+      "status": "hidden",
+      "description": "Project excluded from the public catalogue pending a platform-neutral public description.",
+      "reason": "Excluded from public catalogue by curation policy."
+    },
+    "termux-pro-app": {
+      "include": false,
+      "category": "Apps & Tools",
+      "status": "hidden",
+      "description": "Project excluded from the public catalogue pending a platform-neutral public description.",
+      "reason": "Excluded from public catalogue by curation policy."
+    },
+    "SYJ-LeadForge": {
+      "homepage": ""
+    },
+    "AI-Zara-web-widget": {
+      "homepage": ""
     }
   },
   "repositories": {
