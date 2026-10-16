@@ -1591,6 +1591,10 @@ Every included <span>project.</span>
 All curated public repositories are rendered in HTML at build time. JavaScript only enhances search, filters and sorting.
 </p>
 
+<h2 class="catalogue-section-title">
+Browse projects
+</h2>
+
 </section>
 
 <section

@@ -19,3 +19,13 @@ html,body{max-width:100%}body{overflow-x:clip}
 @media(max-width:560px){.hero h1,.catalogue-head h1,.project-hero h1{overflow-wrap:anywhere}.hero-bottom{gap:12px;flex-wrap:wrap}.project-detail dl div{grid-template-columns:minmax(90px,34%) minmax(0,1fr);gap:12px}.site-header{gap:10px}.brand{min-width:0}.brand strong{font-size:14px}}
 @media(max-width:360px){.hero h1,.catalogue-head h1,.project-hero h1{font-size:clamp(38px,12vw,46px)}.hero,.section,.catalogue-head,.project-hero,.project-detail{padding-left:14px;padding-right:14px}.actions .button{max-width:100%}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.hero-copy{animation:none}.catalogue-grid,.card,.button{transform:none!important}}
+
+.catalogue-section-title {
+  font-size: clamp(22px, 3vw, 30px);
+  line-height: 1.15;
+  letter-spacing: -.025em;
+  margin: 28px 0 0;
+}
+@media (max-width: 560px) {
+  .catalogue-section-title { margin-top: 24px; }
+}
