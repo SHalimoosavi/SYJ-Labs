@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "node scripts/build.mjs && node scripts/postbuild-clean.mjs",
+    "build": "node scripts/build.mjs && node scripts/sync-public-assets.mjs && node scripts/postbuild-clean.mjs",
     "build:previews": "node scripts/generate-previews.mjs",
     "verify:dist": "node scripts/verify-dist.mjs",
     "validate:html": "html-validate \"dist/**/*.html\"",
