@@ -25,11 +25,11 @@ if (token) {
   headers.Authorization = `Bearer ${token}`;
 }
 
-const readJson = async (file, fallback) => {
+const readJson = async file => {
   try {
     return JSON.parse(await fs.readFile(file, 'utf8'));
-  } catch {
-    return fallback;
+  } catch (error) {
+    throw new Error(`Cannot read required JSON file ${file}: ${error.message}`);
   }
 };
 
@@ -243,8 +243,10 @@ async function readmeDescription(repo) {
       if (candidate) {
         return candidate.slice(0, 220);
       }
-    } catch {
-      // Continue to next README candidate.
+    } catch (error) {
+      console.warn(
+        `WARN: README lookup failed for ${repo.name}/${filename}: ${error.message}`
+      );
     }
   }
 
@@ -345,13 +347,7 @@ async function customOgMap() {
 }
 
 async function loadCuration() {
-  return readJson(
-    path.join(ROOT, 'data/curation.json'),
-    {
-      _defaults: {},
-      overrides: {}
-    }
-  );
+  return readJson(path.join(ROOT, 'data/curation.json'));
 }
 
 function curate(repo, curation) {
@@ -819,13 +815,7 @@ const curation =
 
 const repos =
   process.env.SYJ_LABS_FIXTURE === '1'
-    ? await readJson(
-        path.join(
-          ROOT,
-          'data/fixture.json'
-        ),
-        []
-      )
+    ? await readJson(path.join(ROOT, 'data/fixture.json'))
     : await fetchAllRepos();
 
 console.log(
