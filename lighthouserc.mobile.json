@@ -6,7 +6,7 @@
         "http://127.0.0.1:4173/projects/index.html"
       ],
       "numberOfRuns": 3,
-      "settings": { "preset": "mobile" }
+      "settings": { "formFactor": "mobile" }
     },
     "assert": {
       "assertions": {
