@@ -69,6 +69,13 @@ function optimizeCatalogue(html) {
     return `<article${attrs} hidden>`;
   });
 
+  if (!html.includes('id="catalogue-section-heading"')) {
+    html = html.replace(
+      /(<section\s+class=["']grid catalogue-grid["'][^>]*id=["']catalogue["'])/i,
+      '<h2 id="catalogue-section-heading" class="catalogue-section-heading">Projects</h2>$1'
+    );
+  }
+
   if (cardIndex > 12 && !html.includes('id="load-more-projects"')) {
     html = html.replace(
       /(<section\s+class=["']grid catalogue-grid["'][^>]*id=["']catalogue["'][\s\S]*?<\/section>)/i,
@@ -79,7 +86,7 @@ function optimizeCatalogue(html) {
 }
 
 function injectAccessibilityStyles(html) {
-  const style = `<style id="syj-a11y-overrides">.hero-bottom{color:#72948c}.focus-grid b{color:#72948c}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d7ff63;outline-offset:3px}</style>`;
+  const style = `<style id="syj-a11y-overrides">.hero-bottom{color:#72948c}.focus-grid b{color:#72948c}.catalogue-section-heading{max-width:1180px;margin:0 auto 18px;padding:0 24px;font-size:28px;line-height:1.1}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d7ff63;outline-offset:3px}</style>`;
   return html.includes('id="syj-a11y-overrides"') ? html : html.replace('</head>', `${style}</head>`);
 }
 
@@ -109,4 +116,4 @@ for (const file of files) {
   if (/\.(html|txt)$/i.test(file)) await cleanHtml(file);
 }
 
-console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized to WebP, markdown artifacts cleaned, catalogue loading optimized, and accessibility focus/contrast fixes injected.');
+console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized to WebP, markdown artifacts cleaned, catalogue loading optimized, and accessibility fixes injected.');
