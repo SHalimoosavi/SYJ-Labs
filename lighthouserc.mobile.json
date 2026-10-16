@@ -2,8 +2,8 @@
   "ci": {
     "collect": {
       "url": [
-        "http://127.0.0.1:4173/index.html",
-        "http://127.0.0.1:4173/projects/index.html"
+        "https://127.0.0.1:4173/index.html",
+        "https://127.0.0.1:4173/projects/index.html"
       ],
       "numberOfRuns": 3,
       "settings": {
@@ -23,7 +23,7 @@
           "uploadThroughputKbps": 750,
           "cpuSlowdownMultiplier": 4
         },
-        "chromeFlags": ["--no-sandbox", "--disable-dev-shm-usage"]
+        "chromeFlags": ["--no-sandbox", "--disable-dev-shm-usage", "--ignore-certificate-errors"]
       }
     },
     "assert": {
