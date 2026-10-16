@@ -1013,15 +1013,10 @@ await fs.mkdir(
   }
 );
 
-await fs.copyFile(
-  path.join(
-    ROOT,
-    'data/projects.json'
-  ),
-  path.join(
-    DIST,
-    'data/projects.json'
-  )
+const publicProjects = projects.filter(project => !/termux/i.test(project.name));
+await write(
+  path.join(DIST, 'data/projects.json'),
+  JSON.stringify({ projects: publicProjects }, null, 2) + '\n'
 );
 
 const included =
