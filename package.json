@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "build": "node scripts/build.mjs && node scripts/sync-public-assets.mjs && node scripts/postbuild-clean.mjs && node scripts/sanitize-generated.mjs && node scripts/patch-performance.mjs",
+    "build": "node scripts/build.mjs && node scripts/sync-public-assets.mjs && node scripts/postbuild-clean.mjs && node scripts/optimize-generated-images.mjs && node scripts/sanitize-generated.mjs && node scripts/patch-performance.mjs",
     "verify:dist": "node scripts/verify-dist.mjs",
     "validate:html": "html-validate \"dist/**/*.html\"",
     "validate:a11y": "start-server-and-test \"serve:dist\" http://127.0.0.1:4173/SYJ-Labs/ \"pa11y http://127.0.0.1:4173/SYJ-Labs/ --standard WCAG2AA\"",
