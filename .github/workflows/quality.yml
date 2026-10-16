@@ -100,7 +100,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - name: Start local Lighthouse server
-        run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
+      - name: Generate temporary local TLS certificate
+        run: |
+          openssl req -x509 -newkey rsa:2048 -nodes \
+            -keyout /tmp/syj-key.pem \
+            -out /tmp/syj-cert.pem \
+            -days 1 \
+            -subj '/CN=127.0.0.1'
+
+      - name: Start local HTTPS Lighthouse server
+        run: npx http-server dist -S -C /tmp/syj-cert.pem -K /tmp/syj-key.pem -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
 
       - run: sleep 2 && npx lhci autorun --config=lighthouserc.${{ matrix.mode }}.json
