@@ -57,7 +57,7 @@ jobs:
           rm -rf /tmp/syj-link-check
           cp -a dist /tmp/syj-link-check
           find /tmp/syj-link-check -type f \( -name '*.html' -o -name '*.xml' -o -name '*.txt' \) -print0 \
-            | xargs -0 sed -i 's#https://shalimoosavi.github.io/SYJ-Labs/#/#g'
+            | xargs -0 sed -i 's#https://shalimoosavi.github.io/SYJ-Labs/#/#g; s#/SYJ-Labs/#/#g'
 
       - name: Validate internal and external links
         run: |
@@ -83,3 +83,25 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  production-lighthouse:
+    name: Lighthouse production gate
+    needs: deploy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [mobile, desktop]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install --no-audit --no-fund
+
+      - name: Wait for GitHub Pages propagation
+        run: sleep 20
+
+      - name: Run Lighthouse against deployed Pages site
+        run: npx lhci autorun --config=lighthouserc.production.${{ matrix.mode }}.json
