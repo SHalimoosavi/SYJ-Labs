@@ -7,8 +7,8 @@ const DIST = path.join(ROOT, 'dist');
 const required = [
   'index.html',
   '404.html',
-  'css/styles.css',
-  'js/main.js',
+  'assets/site.css',
+  'assets/site.js',
   'projects/index.html',
   'sitemap.xml',
   'robots.txt',
@@ -42,8 +42,8 @@ for (const relative of required) {
 if (missing.length) throw new Error(`Missing required public files:\n- ${missing.join('\n- ')}`);
 
 await walk(DIST);
-const broken = [];
 const localPattern = /(?:href|src)=["']([^"'#?]+)["']/gi;
+const broken = [];
 
 for (const file of htmlFiles) {
   const html = await fs.readFile(file, 'utf8');
@@ -70,4 +70,4 @@ for (const url of sitemapUrls) {
   if (!(await exists(normalized))) throw new Error(`Sitemap target missing: ${url}`);
 }
 
-console.log(`dist verification passed: ${htmlFiles.length} HTML pages, ${sitemapUrls.length} sitemap URLs, all required assets present.`);
+console.log(`dist verification passed: ${htmlFiles.length} HTML pages, ${sitemapUrls.length} sitemap URLs, all required assets present and all local HTML references resolve.`);
