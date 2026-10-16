@@ -40,6 +40,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      - name: Verify deployment artifact
+        run: npm run verify:dist
+
       - name: Validate generated HTML
         run: npm run validate:html
 
