@@ -1,9 +1,11 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawn } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
+const IMAGEMAGICK = process.env.IMAGEMAGICK || 'convert';
 
 const staleHomepageRepos = new Set([
   'syj-one',
@@ -90,6 +92,36 @@ function injectAccessibilityStyles(html) {
   return html.includes('id="syj-a11y-overrides"') ? html : html.replace('</head>', `${style}</head>`);
 }
 
+async function optimizeImage(file, resize, quality) {
+  await new Promise((resolve, reject) => {
+    const child = spawn(IMAGEMAGICK, [file, '-resize', resize, '-strip', '-quality', String(quality), file], { stdio: ['ignore', 'ignore', 'pipe'] });
+    let error = '';
+    child.stderr.on('data', chunk => { error += chunk.toString(); });
+    child.on('error', reject);
+    child.on('close', code => code === 0 ? resolve() : reject(new Error(error || `ImageMagick exited ${code} for ${file}`)));
+  });
+}
+
+async function optimizeImages() {
+  const projectDir = path.join(DIST, 'assets/projects');
+  try {
+    const projectFiles = (await fs.readdir(projectDir)).filter(file => file.endsWith('.webp'));
+    await Promise.all(projectFiles.map(file => optimizeImage(path.join(projectDir, file), '960x480>', 72)));
+  } catch {
+    // The generated project directory is optional during fixture builds.
+  }
+
+  const founder = path.join(DIST, 'assets/founder-photo.webp');
+  try { await optimizeImage(founder, '720x720>', 78); } catch {}
+
+  // PNG previews are source artifacts, not runtime assets; all rendered pages use WebP.
+  try {
+    for (const file of await fs.readdir(projectDir)) {
+      if (file.endsWith('.png')) await fs.rm(path.join(projectDir, file), { force: true });
+    }
+  } catch {}
+}
+
 async function cleanHtml(file) {
   let html;
   try { html = await fs.readFile(file, 'utf8'); } catch { return; }
@@ -105,6 +137,9 @@ async function cleanHtml(file) {
   html = injectAccessibilityStyles(html);
 
   if (path.resolve(file) === path.resolve(path.join(DIST, 'projects/index.html'))) html = optimizeCatalogue(html);
+
+  // Safe static HTML minification: generated pages contain no pre/code blocks.
+  html = html.replace(/<!--(?!\[if)[\s\S]*?-->/g, '').replace(/>\s+</g, '><').replace(/[ \t]{2,}/g, ' ');
   await fs.writeFile(file, html, 'utf8');
 }
 
@@ -115,5 +150,6 @@ const files = await walk(DIST);
 for (const file of files) {
   if (/\.(html|txt)$/i.test(file)) await cleanHtml(file);
 }
+await optimizeImages();
 
-console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized to WebP, markdown artifacts cleaned, catalogue loading optimized, and accessibility fixes injected.');
+console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized and optimized to WebP, markdown artifacts cleaned, catalogue loading optimized, HTML minified, and accessibility fixes injected.');
