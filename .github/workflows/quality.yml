@@ -72,7 +72,7 @@ jobs:
       - name: Start local accessibility server
         run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
 
-      - run: sleep 2 && npx pa11y --chrome-args="--no-sandbox --disable-dev-shm-usage" http://127.0.0.1:4173/index.html --standard WCAG2AA && npx pa11y --chrome-args="--no-sandbox --disable-dev-shm-usage" http://127.0.0.1:4173/projects/index.html --standard WCAG2AA
+      - run: npx pa11y http://127.0.0.1:4173/index.html --config ./pa11y.json && npx pa11y http://127.0.0.1:4173/projects/index.html --config ./pa11y.json
 
   lighthouse:
     runs-on: ubuntu-latest
