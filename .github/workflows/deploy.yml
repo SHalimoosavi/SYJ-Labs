@@ -40,6 +40,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
+      # The generated site intentionally uses the GitHub Pages project prefix
+      # (/SYJ-Labs/). Locally, dist/ is the web root, so expose the same prefix
+      # during validation without putting a nested directory into the artifact.
+      - name: Mount GitHub Pages base path for validation
+        run: ln -s . dist/SYJ-Labs
+
       - name: Verify deployment artifact
         run: npm run verify:dist
 
@@ -48,6 +54,9 @@ jobs:
 
       - name: Validate internal and external links
         run: npm run validate:links
+
+      - name: Remove validation mount before upload
+        run: rm dist/SYJ-Labs
 
       - uses: actions/configure-pages@v5
 
