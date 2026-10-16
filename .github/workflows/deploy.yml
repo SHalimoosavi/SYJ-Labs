@@ -35,9 +35,16 @@ jobs:
 
       - run: npm install --no-audit --no-fund
 
-      - run: npm run build
+      - name: Build site
+        run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Validate generated HTML
+        run: npm run validate:html
+
+      - name: Validate internal and external links
+        run: npm run validate:links
 
       - uses: actions/configure-pages@v5
 
