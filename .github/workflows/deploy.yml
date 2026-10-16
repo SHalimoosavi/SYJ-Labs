@@ -12,9 +12,6 @@ permissions:
   pages: write
   id-token: write
 
-# GitHub is migrating Actions away from the Node 20 runtime. Keep older
-# Pages actions on the Node 24 runtime while their major versions remain
-# unchanged, and use the current Node 24-native checkout/setup actions.
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -39,15 +36,12 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
 
       - name: Build site
         run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Mount GitHub Pages base path for artifact validation
-        run: ln -s . dist/SYJ-Labs
 
       - name: Verify deployment artifact
         run: npm run verify:dist
@@ -55,9 +49,6 @@ jobs:
       - name: Validate generated HTML
         run: npm run validate:html
 
-      # Validate the built artifact locally. Canonical/OG metadata intentionally
-      # points at the future production Pages URL, which can be unavailable while
-      # this build is being created, so rewrite that origin only in the test copy.
       - name: Prepare local link validation copy
         run: |
           rm -rf /tmp/syj-link-check
@@ -71,12 +62,12 @@ jobs:
           sleep 2
           npx --yes linkinator http://127.0.0.1:4173/ --recurse --silent
 
-      - name: Remove validation mount before upload
-        run: rm dist/SYJ-Labs
+      - name: Remove validation-only files
+        run: rm -f dist/SYJ-Labs
 
       - uses: actions/configure-pages@v5
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 
@@ -95,6 +86,7 @@ jobs:
     needs: deploy
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         mode: [mobile, desktop]
     steps:
@@ -103,8 +95,9 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          cache: npm
 
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
 
       - name: Wait for GitHub Pages propagation
         shell: bash
@@ -113,6 +106,7 @@ jobs:
           urls=(
             "https://shalimoosavi.github.io/SYJ-Labs/"
             "https://shalimoosavi.github.io/SYJ-Labs/projects/"
+            "https://shalimoosavi.github.io/SYJ-Labs/projects/syj-llm/"
           )
 
           for attempt in $(seq 1 60); do
@@ -125,7 +119,7 @@ jobs:
             done
 
             if [ "$ready" = true ]; then
-              echo "GitHub Pages is serving both Lighthouse targets."
+              echo "GitHub Pages is serving all Lighthouse targets."
               exit 0
             fi
 
