@@ -686,7 +686,7 @@ function layout({
 <meta name="description" content="${esc(description)}">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
 <link rel="canonical" href="${esc(canonical)}">
-<link rel="icon" href="${BASE}assets/syj-labs-logo-64.png">
+<link rel="icon" href="${BASE}assets/syj-labs-logo.png">
 <link rel="preload" as="font" type="font/woff2" href="${BASE}assets/fonts/lato-medium.woff2" crossorigin>
 <link rel="stylesheet" href="${BASE}assets/site.css">
 
@@ -988,7 +988,7 @@ for (const file of ['founder-photo.webp', 'site.css', 'site.js']) {
 }
 
 const logoSource = path.join(ROOT, 'assets', 'syj-labs-logo.png');
-const logoTarget = path.join(DIST, 'assets', 'syj-labs-logo-64.png');
+const logoTarget = path.join(DIST, 'assets', 'syj-labs-logo.png');
 try {
   await fs.access(logoSource);
   await new Promise((resolve, reject) => {
@@ -1084,7 +1084,7 @@ const org = {
   name: 'SYJ LABS',
   url: SITE,
   logo:
-    `${SITE}assets/syj-labs-logo-64.png`,
+    `${SITE}assets/syj-labs-logo.png`,
   description:
     'A technology lab focused on practical AI tools, blockchain engineering, software development and automation.',
   sameAs: [
