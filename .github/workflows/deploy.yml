@@ -107,7 +107,34 @@ jobs:
       - run: npm install --no-audit --no-fund
 
       - name: Wait for GitHub Pages propagation
-        run: sleep 20
+        shell: bash
+        run: |
+          set -euo pipefail
+          urls=(
+            "https://shalimoosavi.github.io/SYJ-Labs/"
+            "https://shalimoosavi.github.io/SYJ-Labs/projects/"
+          )
+
+          for attempt in $(seq 1 60); do
+            ready=true
+            for url in "${urls[@]}"; do
+              if ! curl --fail --silent --show-error --location --output /dev/null "$url"; then
+                ready=false
+                break
+              fi
+            done
+
+            if [ "$ready" = true ]; then
+              echo "GitHub Pages is serving both Lighthouse targets."
+              exit 0
+            fi
+
+            echo "Pages propagation still in progress (attempt ${attempt}/60); retrying in 5s..."
+            sleep 5
+          done
+
+          echo "GitHub Pages did not serve all Lighthouse targets within 5 minutes."
+          exit 1
 
       - name: Run Lighthouse against deployed Pages site
         run: npx lhci autorun --config=lighthouserc.production.${{ matrix.mode }}.json
