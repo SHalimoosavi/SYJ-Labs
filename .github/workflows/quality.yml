@@ -34,11 +34,18 @@ jobs:
 
       - run: npm run validate:html
 
-      - run: ln -s . dist/SYJ-Labs
+      - name: Prepare local link validation copy
+        run: |
+          rm -rf /tmp/syj-link-check
+          cp -a dist /tmp/syj-link-check
+          find /tmp/syj-link-check -type f \( -name '*.html' -o -name '*.xml' -o -name '*.txt' \) -print0 \
+            | xargs -0 sed -i 's#https://shalimoosavi.github.io/SYJ-Labs/#/#g'
 
-      - run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
-
-      - run: sleep 2 && npx --yes linkinator http://127.0.0.1:4173/SYJ-Labs/ --recurse --silent
+      - name: Validate internal and external links
+        run: |
+          npx http-server /tmp/syj-link-check -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
+          sleep 2
+          npx --yes linkinator http://127.0.0.1:4173/ --recurse --silent
 
   accessibility:
     runs-on: ubuntu-latest
@@ -62,11 +69,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - run: ln -s . dist/SYJ-Labs
+      - name: Start local validation server
+        run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
 
-      - run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
-
-      - run: sleep 2 && npx pa11y http://127.0.0.1:4173/SYJ-Labs/ --standard WCAG2AA && npx pa11y http://127.0.0.1:4173/SYJ-Labs/projects/ --standard WCAG2AA
+      - run: sleep 2 && npx pa11y http://127.0.0.1:4173/index.html --standard WCAG2AA && npx pa11y http://127.0.0.1:4173/projects/index.html --standard WCAG2AA
 
   lighthouse:
     runs-on: ubuntu-latest
@@ -94,8 +100,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      - run: ln -s . dist/SYJ-Labs
-
-      - run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
+      - name: Start local Lighthouse server
+        run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
 
       - run: sleep 2 && npx lhci autorun --config=lighthouserc.${{ matrix.mode }}.json
