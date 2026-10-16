@@ -40,10 +40,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
 
-      # The generated site intentionally uses the GitHub Pages project prefix
-      # (/SYJ-Labs/). Locally, dist/ is the web root, so expose the same prefix
-      # during validation without putting a nested directory into the artifact.
-      - name: Mount GitHub Pages base path for validation
+      - name: Mount GitHub Pages base path for artifact validation
         run: ln -s . dist/SYJ-Labs
 
       - name: Verify deployment artifact
@@ -52,8 +49,21 @@ jobs:
       - name: Validate generated HTML
         run: npm run validate:html
 
+      # Validate the built artifact locally. Canonical/OG metadata intentionally
+      # points at the future production Pages URL, which can be unavailable while
+      # this build is being created, so rewrite that origin only in the test copy.
+      - name: Prepare local link validation copy
+        run: |
+          rm -rf /tmp/syj-link-check
+          cp -a dist /tmp/syj-link-check
+          find /tmp/syj-link-check -type f \( -name '*.html' -o -name '*.xml' -o -name '*.txt' \) -print0 \
+            | xargs -0 sed -i 's#https://shalimoosavi.github.io/SYJ-Labs/#/#g'
+
       - name: Validate internal and external links
-        run: npm run validate:links
+        run: |
+          npx http-server /tmp/syj-link-check -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
+          sleep 2
+          npx --yes linkinator http://127.0.0.1:4173/ --recurse --silent
 
       - name: Remove validation mount before upload
         run: rm dist/SYJ-Labs
