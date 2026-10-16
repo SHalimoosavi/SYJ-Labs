@@ -981,17 +981,34 @@ const logoSource = path.join(ROOT, 'assets', 'syj-labs-logo.png');
 const logoTarget = path.join(DIST, 'assets', 'syj-labs-logo.png');
 try {
   await fs.access(logoSource);
-  await new Promise((resolve, reject) => {
-    const child = spawn(IMAGEMAGICK, [logoSource, '-thumbnail', '64x64', '-strip', '-define', 'png:compression-level=9', logoTarget], {stdio:['ignore','ignore','pipe']});
-    let errorText = '';
-    child.stderr.on('data', chunk => { errorText += chunk.toString(); });
-    child.on('error', reject);
-    child.on('close', code => code === 0 ? resolve() : reject(new Error(errorText || `ImageMagick exited ${code}`)));
-  });
 } catch (error) {
-  throw new Error(`Required logo optimization failed for ${logoSource}: ${error.message}`);
+  throw new Error(`Required source logo is missing: ${logoSource}: ${error.message}`);
 }
-console.log('Required assets copied; logo optimized to 64px; unused YouTube QR omitted.');
+
+let logoOptimizedBy = 'ImageMagick fallback';
+try {
+  const sharpModule = await import('sharp');
+  const sharp = sharpModule.default || sharpModule;
+  await sharp(logoSource)
+    .resize({ width: 256, height: 256, fit: 'inside', withoutEnlargement: true })
+    .png({ compressionLevel: 9, adaptiveFiltering: true })
+    .toFile(logoTarget);
+  logoOptimizedBy = 'sharp';
+} catch (sharpError) {
+  console.warn(`WARN: sharp logo optimization unavailable; using ImageMagick fallback: ${sharpError.message}`);
+  try {
+    await new Promise((resolve, reject) => {
+      const child = spawn(IMAGEMAGICK, [logoSource, '-thumbnail', '256x256', '-strip', '-define', 'png:compression-level=9', logoTarget], { stdio: ['ignore', 'ignore', 'pipe'] });
+      let errorText = '';
+      child.stderr.on('data', chunk => { errorText += chunk.toString(); });
+      child.on('error', reject);
+      child.on('close', code => code === 0 ? resolve() : reject(new Error(errorText || `ImageMagick exited ${code}`)));
+    });
+  } catch (imageMagickError) {
+    throw new Error(`Required logo optimization failed for ${logoSource}. sharp: ${sharpError.message}; ImageMagick: ${imageMagickError.message}`);
+  }
+}
+console.log(`Required assets copied; logo optimized to 256px maximum using ${logoOptimizedBy}; unused YouTube QR omitted.`);
 
 await fs.mkdir(
   path.join(
