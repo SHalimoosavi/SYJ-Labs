@@ -156,7 +156,7 @@ jobs:
 
       - run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
 
-      - run: sleep 2 && npx lhci autorun --config=lighthouserc.${{ matrix.mode }}.json
+      - run: sleep 2 && npx lhci collect --config=lighthouserc.${{ matrix.mode }}.json
 
       - name: Print Lighthouse scores and failing audits
         if: always()
@@ -168,3 +168,9 @@ jobs:
           name: lighthouse-${{ matrix.mode }}-results
           path: .lighthouseci/
           if-no-files-found: warn
+
+      - name: Upload Lighthouse reports
+        run: npx lhci upload --config=lighthouserc.${{ matrix.mode }}.json
+
+      - name: Assert Lighthouse thresholds
+        run: npx lhci assert --config=lighthouserc.${{ matrix.mode }}.json

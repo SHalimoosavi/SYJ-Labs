@@ -1385,7 +1385,8 @@ FOUNDER · CTO · MANAGING DIRECTOR
 
 function card(
   p,
-  index = 0
+  index = 0,
+  prioritizeFirstImage = false
 ) {
   const preview =
     `${BASE}assets/projects/${p.slug}.webp`;
@@ -1406,7 +1407,8 @@ function card(
   alt="${esc(p.name)} project preview"
   width="960"
   height="480"
-  loading="lazy"
+  loading="${prioritizeFirstImage && index === 0 ? 'eager' : 'lazy'}"
+  fetchpriority="${prioritizeFirstImage && index === 0 ? 'high' : 'auto'}"
   decoding="async">
 
 <span class="index">
@@ -1702,7 +1704,7 @@ ${included.length} projects
 ${included
   .map(
     (p, i) =>
-      card(p, i)
+      card(p, i, true)
   )
   .join('')}
 
