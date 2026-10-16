@@ -12,6 +12,12 @@ permissions:
   pages: write
   id-token: write
 
+# GitHub is migrating Actions away from the Node 20 runtime. Keep older
+# Pages actions on the Node 24 runtime while their major versions remain
+# unchanged, and use the current Node 24-native checkout/setup actions.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -20,7 +26,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install ImageMagick
         run: |
@@ -28,7 +34,7 @@ jobs:
           sudo apt-get install -y imagemagick
           convert -version
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -92,9 +98,9 @@ jobs:
       matrix:
         mode: [mobile, desktop]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
 
