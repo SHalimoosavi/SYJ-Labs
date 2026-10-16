@@ -39,9 +39,7 @@ function cleanProjectData(projects) {
     const slug = String(project.slug || '').toLowerCase();
     const homepage = String(project.homepage || '');
     project.homepage = '';
-    if (staleHomepageRepos.has(slug) || staleHomepageUrls.has(homepage)) {
-      project.homepage = '';
-    }
+    if (staleHomepageRepos.has(slug) || staleHomepageUrls.has(homepage)) project.homepage = '';
   }
   return projects;
 }
@@ -80,6 +78,11 @@ function optimizeCatalogue(html) {
   return html;
 }
 
+function injectAccessibilityStyles(html) {
+  const style = `<style id="syj-a11y-overrides">.hero-bottom{color:#72948c}.focus-grid b{color:#72948c}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d7ff63;outline-offset:3px}</style>`;
+  return html.includes('id="syj-a11y-overrides"') ? html : html.replace('</head>', `${style}</head>`);
+}
+
 async function cleanHtml(file) {
   let html;
   try { html = await fs.readFile(file, 'utf8'); } catch { return; }
@@ -92,11 +95,9 @@ async function cleanHtml(file) {
   html = html.replace(/(assets\/projects\/[^"'?#]+)\.png/gi, '$1.webp');
   html = html.replace(/\s*<a\b[^>]*class=["'][^"']*button[^"']*["'][^>]*>\s*Live site\s*↗\s*<\/a>/gi, '');
   html = stripMarkdownLinks(html);
+  html = injectAccessibilityStyles(html);
 
-  if (path.resolve(file) === path.resolve(path.join(DIST, 'projects/index.html'))) {
-    html = optimizeCatalogue(html);
-  }
-
+  if (path.resolve(file) === path.resolve(path.join(DIST, 'projects/index.html'))) html = optimizeCatalogue(html);
   await fs.writeFile(file, html, 'utf8');
 }
 
@@ -108,4 +109,4 @@ for (const file of files) {
   if (/\.(html|txt)$/i.test(file)) await cleanHtml(file);
 }
 
-console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized to WebP, markdown artifacts cleaned, and catalogue loading optimized.');
+console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized to WebP, markdown artifacts cleaned, catalogue loading optimized, and accessibility focus/contrast fixes injected.');
