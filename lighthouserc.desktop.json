@@ -6,7 +6,17 @@
         "http://127.0.0.1:4173/projects/index.html"
       ],
       "numberOfRuns": 3,
-      "settings": { "preset": "desktop" }
+      "settings": {
+        "formFactor": "desktop",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "chromeFlags": ["--no-sandbox", "--disable-dev-shm-usage"]
+      }
     },
     "assert": {
       "assertions": {
