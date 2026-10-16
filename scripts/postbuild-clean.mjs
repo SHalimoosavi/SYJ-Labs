@@ -88,7 +88,7 @@ function optimizeCatalogue(html) {
 }
 
 function injectAccessibilityStyles(html) {
-  const style = `<style id="syj-a11y-overrides">.hero-bottom{color:#72948c}.focus-grid b{color:#72948c}.catalogue-section-heading{max-width:1180px;margin:0 auto 18px;padding:0 24px;font-size:28px;line-height:1.1}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d7ff63;outline-offset:3px}</style>`;
+  const style = `<style id="syj-a11y-overrides">.hero-bottom{color:#72948c}.focus-grid b{color:#72948c}.catalogue-section-heading{max-width:1180px;margin:0 auto 18px;padding:0 24px;font-size:28px;line-height:1.1}.site-header{backdrop-filter:none!important}.hero-glow{filter:none!important;animation:none!important}.reveal{animation:none!important}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d7ff63;outline-offset:3px}</style>`;
   return html.includes('id="syj-a11y-overrides"') ? html : html.replace('</head>', `${style}</head>`);
 }
 
@@ -107,14 +107,11 @@ async function optimizeImages() {
   try {
     const projectFiles = (await fs.readdir(projectDir)).filter(file => file.endsWith('.webp'));
     await Promise.all(projectFiles.map(file => optimizeImage(path.join(projectDir, file), '960x480>', 72)));
-  } catch {
-    // The generated project directory is optional during fixture builds.
-  }
+  } catch {}
 
   const founder = path.join(DIST, 'assets/founder-photo.webp');
   try { await optimizeImage(founder, '720x720>', 78); } catch {}
 
-  // PNG previews are source artifacts, not runtime assets; all rendered pages use WebP.
   try {
     for (const file of await fs.readdir(projectDir)) {
       if (file.endsWith('.png')) await fs.rm(path.join(projectDir, file), { force: true });
@@ -138,7 +135,6 @@ async function cleanHtml(file) {
 
   if (path.resolve(file) === path.resolve(path.join(DIST, 'projects/index.html'))) html = optimizeCatalogue(html);
 
-  // Safe static HTML minification: generated pages contain no pre/code blocks.
   html = html.replace(/<!--(?!\[if)[\s\S]*?-->/g, '').replace(/>\s+</g, '><').replace(/[ \t]{2,}/g, ' ');
   await fs.writeFile(file, html, 'utf8');
 }
@@ -152,4 +148,4 @@ for (const file of files) {
 }
 await optimizeImages();
 
-console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized and optimized to WebP, markdown artifacts cleaned, catalogue loading optimized, HTML minified, and accessibility fixes injected.');
+console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews optimized to WebP, markdown artifacts cleaned, catalogue loading optimized, HTML minified, and accessibility/performance fixes injected.');
