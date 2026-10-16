@@ -8,6 +8,7 @@
       "numberOfRuns": 3,
       "settings": {
         "formFactor": "desktop",
+        "throttlingMethod": "provided",
         "screenEmulation": {
           "mobile": false,
           "width": 1350,
