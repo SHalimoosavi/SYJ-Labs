@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import fsSync from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,10 +23,6 @@ const required = [
 
 const exists = async file => {
   try { await fs.access(file); return true; } catch { return false; }
-};
-
-const stat = async file => {
-  try { return await fs.stat(file); } catch { return null; }
 };
 
 const htmlFiles = [];
@@ -64,16 +61,8 @@ function resolvePublicReference(file, ref) {
 function checkReference(file, ref, label) {
   if (/^(?:https?:|mailto:|tel:|javascript:|data:|\/\/|#)/i.test(ref)) return;
   const target = resolvePublicReference(file, ref);
-  if (!existsSync(target)) broken.push(`${path.relative(DIST, file)} -> ${label}: ${ref}`);
+  if (!fsSync.existsSync(target)) broken.push(`${path.relative(DIST, file)} -> ${label}: ${ref}`);
 }
-
-const existsSync = file => {
-  try { return requireFsAccess(file); } catch { return false; }
-};
-const requireFsAccess = file => {
-  // Synchronous existence check avoids creating a large promise fan-out during verification.
-  try { return require('node:fs').existsSync(file); } catch { return false; }
-};
 
 for (const file of htmlFiles) {
   const html = await fs.readFile(file, 'utf8');
@@ -88,9 +77,7 @@ for (const file of htmlFiles) {
     }
   }
 
-  if (PROHIBITED_PUBLIC_COPY.test(html)) {
-    throw new Error(`Prohibited public copy found in ${path.relative(DIST, file)}`);
-  }
+  if (PROHIBITED_PUBLIC_COPY.test(html)) throw new Error(`Prohibited public copy found in ${path.relative(DIST, file)}`);
 
   const ogImages = [...html.matchAll(/<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)["'][^>]*>/gi)].map(m => m[1]);
   for (const image of ogImages) {
@@ -124,14 +111,14 @@ if (!fonts.length) throw new Error('No self-hosted font asset found.');
 if (!ogProjectImages.length) throw new Error('No generated project social-preview images found.');
 
 console.log([
-  `dist verification passed`,
+  'dist verification passed',
   `HTML=${htmlFiles.length}`,
   `projects=${projectPages.length}`,
   `sitemap=${sitemapUrls.length}`,
   `images=${images.length}`,
   `projectOG=${ogProjectImages.length}`,
   `fonts=${fonts.length}`,
-  `localRefs=ok`,
-  `srcset=checked`,
-  `publicCopy=clean`
+  'localRefs=ok',
+  'srcset=checked',
+  'publicCopy=clean'
 ].join(' | '));
