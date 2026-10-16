@@ -36,14 +36,9 @@ async function walk(dir) {
 function cleanProjectData(projects) {
   for (const project of projects) {
     project.description = stripMarkdownLinks(project.description);
-
     const slug = String(project.slug || '').toLowerCase();
     const homepage = String(project.homepage || '');
-
-    // Do not publish stale repository homepage metadata as a production CTA.
-    // The repository itself is always the authoritative project destination.
     project.homepage = '';
-
     if (staleHomepageRepos.has(slug) || staleHomepageUrls.has(homepage)) {
       project.homepage = '';
     }
@@ -54,54 +49,54 @@ function cleanProjectData(projects) {
 async function cleanJson(file) {
   try {
     const data = JSON.parse(await fs.readFile(file, 'utf8'));
-
-    if (Array.isArray(data.projects)) {
-      data.projects = cleanProjectData(data.projects);
-    }
-
+    if (Array.isArray(data.projects)) data.projects = cleanProjectData(data.projects);
     if (data.repositories && typeof data.repositories === 'object') {
       for (const [name, project] of Object.entries(data.repositories)) {
         project.description = stripMarkdownLinks(project.description);
         project.homepage = '';
-        if (staleHomepageRepos.has(String(name).toLowerCase())) {
-          project.homepage = '';
-        }
+        if (staleHomepageRepos.has(String(name).toLowerCase())) project.homepage = '';
       }
     }
-
     await fs.writeFile(file, JSON.stringify(data, null, 2) + '\n', 'utf8');
   } catch {
     // Optional generated JSON; leave missing/unreadable files alone.
   }
 }
 
+function optimizeCatalogue(html) {
+  let cardIndex = 0;
+  html = html.replace(/<article\b([^>]*class=["'][^"']*\bcard\b[^"']*["'][^>]*)>/gi, (full, attrs) => {
+    cardIndex += 1;
+    if (cardIndex <= 12 || /\bhidden\b/.test(attrs)) return full;
+    return `<article${attrs} hidden>`;
+  });
+
+  if (cardIndex > 12 && !html.includes('id="load-more-projects"')) {
+    html = html.replace(
+      /(<section\s+class=["']grid catalogue-grid["'][^>]*id=["']catalogue["'][\s\S]*?<\/section>)/i,
+      '$1<div class="center"><button class="button outline" id="load-more-projects" type="button">Load more projects</button></div>'
+    );
+  }
+  return html;
+}
+
 async function cleanHtml(file) {
   let html;
-  try {
-    html = await fs.readFile(file, 'utf8');
-  } catch {
-    return;
-  }
+  try { html = await fs.readFile(file, 'utf8'); } catch { return; }
 
   for (const url of staleHomepageUrls) {
     const escaped = url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    html = html.replace(
-      new RegExp(`\\s*<a\\b[^>]*href=["']${escaped}["'][\\s\\S]*?<\\/a>`, 'gi'),
-      ''
-    );
+    html = html.replace(new RegExp(`\\s*<a\\b[^>]*href=["']${escaped}["'][\\s\\S]*?<\\/a>`, 'gi'), '');
   }
 
-  // The catalogue uses WebP previews. Keep project detail pages on the same
-  // runtime asset so one generated asset is used consistently everywhere.
   html = html.replace(/(assets\/projects\/[^"'?#]+)\.png/gi, '$1.webp');
-
-  // Remove live-site CTAs generated from unverified GitHub homepage metadata.
-  html = html.replace(
-    /\s*<a\b[^>]*class=["'][^"']*button[^"']*["'][^>]*>\s*Live site\s*↗\s*<\/a>/gi,
-    ''
-  );
-
+  html = html.replace(/\s*<a\b[^>]*class=["'][^"']*button[^"']*["'][^>]*>\s*Live site\s*↗\s*<\/a>/gi, '');
   html = stripMarkdownLinks(html);
+
+  if (path.resolve(file) === path.resolve(path.join(DIST, 'projects/index.html'))) {
+    html = optimizeCatalogue(html);
+  }
+
   await fs.writeFile(file, html, 'utf8');
 }
 
@@ -110,9 +105,7 @@ await cleanJson(path.join(DIST, 'data/projects.json'));
 
 const files = await walk(DIST);
 for (const file of files) {
-  if (/\.(html|txt)$/i.test(file)) {
-    await cleanHtml(file);
-  }
+  if (/\.(html|txt)$/i.test(file)) await cleanHtml(file);
 }
 
-console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized to WebP, and markdown artifacts cleaned.');
+console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews normalized to WebP, markdown artifacts cleaned, and catalogue loading optimized.');
