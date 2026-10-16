@@ -3,7 +3,8 @@
     "collect": {
       "url": [
         "http://127.0.0.1:4173/index.html",
-        "http://127.0.0.1:4173/projects/index.html"
+        "http://127.0.0.1:4173/projects/index.html",
+        "http://127.0.0.1:4173/projects/syj-llm/index.html"
       ],
       "numberOfRuns": 3,
       "settings": { "preset": "desktop" }

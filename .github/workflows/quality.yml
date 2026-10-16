@@ -144,3 +144,14 @@ jobs:
       - run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
 
       - run: sleep 2 && npx lhci autorun --config=lighthouserc.${{ matrix.mode }}.json
+
+      - name: Print Lighthouse scores and failing audits
+        if: always()
+        run: node scripts/summarize-lighthouse.mjs
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-${{ matrix.mode }}-results
+          path: .lighthouseci/
+          if-no-files-found: warn
