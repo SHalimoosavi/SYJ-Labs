@@ -3,13 +3,11 @@
   "private": true,
   "version": "3.0.0",
   "type": "module",
-  "engines": {
-    "node": ">=22"
-  },
+  "engines": {"node": ">=22"},
   "scripts": {
     "prepare:credibility": "node scripts/prepare-credibility.mjs",
     "prepare:catalogue": "node scripts/prepare-catalogue.mjs",
-    "build": "npm run prepare:credibility && npm run prepare:catalogue && node scripts/build.mjs && node scripts/sync-public-assets.mjs && node scripts/postbuild-clean.mjs && node scripts/sanitize-generated.mjs && node scripts/patch-performance.mjs && node scripts/inject-story.mjs && node scripts/credibility-postbuild.mjs",
+    "build": "npm run prepare:credibility && npm run prepare:catalogue && node scripts/build.mjs && node scripts/sync-public-assets.mjs && node scripts/postbuild-clean.mjs && node scripts/sanitize-generated.mjs && node scripts/patch-performance.mjs && node scripts/inject-story.mjs && node scripts/restore-credibility.mjs && node scripts/credibility-postbuild.mjs",
     "verify:dist": "node scripts/verify-dist.mjs && node scripts/verify-credibility.mjs",
     "validate:html": "html-validate \"dist/**/*.html\"",
     "validate:a11y": "start-server-and-test \"serve:dist\" http://127.0.0.1:4173/SYJ-Labs/ \"pa11y http://127.0.0.1:4173/SYJ-Labs/ --standard WCAG2AA\"",
