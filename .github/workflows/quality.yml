@@ -18,34 +18,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
       - name: Install ImageMagick
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
           convert -version
-
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci --no-audit --no-fund
-
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
       - run: npm run verify:dist
       - run: npm run validate:html
-
       - name: Prepare local link validation copy
         run: |
           rm -rf /tmp/syj-link-check
           cp -a dist /tmp/syj-link-check
           find /tmp/syj-link-check -type f \( -name '*.html' -o -name '*.xml' -o -name '*.txt' \) -print0 \
             | xargs -0 sed -i 's#https://shalimoosavi.github.io/SYJ-Labs/#/#g; s#/SYJ-Labs/#/#g'
-
       - name: Validate internal and external links
         run: |
           npx http-server /tmp/syj-link-check -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
@@ -57,30 +50,46 @@ jobs:
     needs: static
     steps:
       - uses: actions/checkout@v5
-
       - name: Install ImageMagick
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
           convert -version
-
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
-
       - run: npm ci --no-audit --no-fund
-
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
       - name: Start local accessibility server
         run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
-
       - name: Run Pa11y on representative pages
         run: |
           npx pa11y http://127.0.0.1:4173/index.html --config ./pa11y.json
           npx pa11y http://127.0.0.1:4173/projects/index.html --config ./pa11y.json
           npx pa11y http://127.0.0.1:4173/projects/syj-llm/index.html --config ./pa11y.json
 
+  lighthouse:
+    name: Lighthouse PR gate
+    runs-on: ubuntu-latest
+    needs: static
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [mobile, desktop]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Start local Lighthouse server
+        run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
+      - name: Run Lighthouse three times
+        run: npx lhci autorun --config=lighthouserc.pr.${{ matrix.mode }}.json
