@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 const curationPath = 'data/curation.json';
 const projectsPath = 'data/projects.json';
 const classificationPath = 'data/credibility-classification.json';
+const distProjectsPath = 'dist/data/projects.json';
 
 const curation = JSON.parse(await fs.readFile(curationPath, 'utf8'));
 const projects = JSON.parse(await fs.readFile(projectsPath, 'utf8'));
@@ -36,29 +37,22 @@ for (const project of projects.projects || []) {
   const entry = curation.repositories?.[project.name];
   const license = entry?.license;
 
-  if (descriptionOverrides[project.name]) {
-    project.description = descriptionOverrides[project.name];
-  } else {
-    project.description = cleanDescription(project.description);
-  }
+  if (descriptionOverrides[project.name]) project.description = descriptionOverrides[project.name];
+  else project.description = cleanDescription(project.description);
 
   if (Array.isArray(project.topics)) {
     project.topics = project.topics.filter(topic => !/termux|mobile-first/i.test(String(topic)));
   }
 
-  if (license && license !== 'NOASSERTION') {
-    project.license = license;
-  } else {
-    delete project.license;
-  }
+  if (license && license !== 'NOASSERTION') project.license = license;
+  else delete project.license;
 }
 
+projects.projects = (projects.projects || []).filter(project => project.include !== false);
+
 for (const [name, entry] of Object.entries(curation.repositories || {})) {
-  if (descriptionOverrides[name]) {
-    entry.description = descriptionOverrides[name];
-  } else {
-    entry.description = cleanDescription(entry.description);
-  }
+  if (descriptionOverrides[name]) entry.description = descriptionOverrides[name];
+  else entry.description = cleanDescription(entry.description);
   if (entry.license === 'NOASSERTION') delete entry.license;
   if (!entry.tier) {
     entry.tier = entry.flagship
@@ -75,5 +69,8 @@ for (const [name, entry] of Object.entries(curation.repositories || {})) {
 await fs.writeFile(curationPath, JSON.stringify(curation, null, 2) + '\n');
 await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2) + '\n');
 await fs.writeFile(classificationPath, JSON.stringify(curation, null, 2) + '\n');
+try {
+  await fs.writeFile(distProjectsPath, JSON.stringify(projects, null, 2) + '\n');
+} catch {}
 
-console.log('Credibility data normalized: default tier=archive; prohibited project metadata filtered; NOASSERTION removed; generated tiers preserved; final classification snapshot preserved.');
+console.log('Credibility data normalized: default tier=archive; prohibited project metadata filtered; NOASSERTION removed; generated tiers preserved; hidden projects removed from generated data.');
