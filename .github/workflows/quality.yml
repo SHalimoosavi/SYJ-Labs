@@ -81,6 +81,11 @@ jobs:
         mode: [mobile, desktop]
     steps:
       - uses: actions/checkout@v5
+      - name: Install ImageMagick
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
+          convert -version
       - uses: actions/setup-node@v5
         with:
           node-version: 22
