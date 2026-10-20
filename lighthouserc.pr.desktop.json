@@ -2,9 +2,9 @@
   "ci": {
     "collect": {
       "url": [
-        "http://127.0.0.1:4173/SYJ-Labs/",
-        "http://127.0.0.1:4173/SYJ-Labs/projects/",
-        "http://127.0.0.1:4173/SYJ-Labs/projects/syj-llm/"
+        "http://127.0.0.1:4173/",
+        "http://127.0.0.1:4173/projects/",
+        "http://127.0.0.1:4173/projects/syj-llm/"
       ],
       "numberOfRuns": 3,
       "settings": {
