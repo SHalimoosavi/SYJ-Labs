@@ -60,7 +60,15 @@ for (const [name, entry] of Object.entries(curation.repositories || {})) {
     entry.description = cleanDescription(entry.description);
   }
   if (entry.license === 'NOASSERTION') delete entry.license;
-  entry.tier ||= 'archive';
+  if (!entry.tier) {
+    entry.tier = entry.flagship
+      ? 'flagship'
+      : entry.status === 'experimental'
+        ? 'experimental'
+        : entry.status === 'archive'
+          ? 'archive'
+          : 'active';
+  }
   if (entry.tier === 'archive') entry.status = 'archive';
 }
 
@@ -68,4 +76,4 @@ await fs.writeFile(curationPath, JSON.stringify(curation, null, 2) + '\n');
 await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2) + '\n');
 await fs.writeFile(classificationPath, JSON.stringify(curation, null, 2) + '\n');
 
-console.log('Credibility data normalized: default tier=archive; prohibited project metadata filtered; NOASSERTION removed; final classification snapshot preserved.');
+console.log('Credibility data normalized: default tier=archive; prohibited project metadata filtered; NOASSERTION removed; generated tiers preserved; final classification snapshot preserved.');
