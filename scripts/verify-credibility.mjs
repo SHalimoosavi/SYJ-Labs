@@ -41,16 +41,29 @@ for(const [name,p] of flagships){
 }
 
 const catalogue=await fs.readFile(path.join(DIST,'projects/index.html'),'utf8');
+const home=await fs.readFile(path.join(DIST,'index.html'),'utf8');
 const llms=await fs.readFile(path.join(DIST,'llms.txt'),'utf8');
 const sitemap=await fs.readFile(path.join(DIST,'sitemap.xml'),'utf8');
+const countPattern=/(\d+) public projects/g;
+const countFromText=text=>[...text.matchAll(countPattern)].map(m=>Number(m[1]));
+const embeddedCounts=[...countFromText(home),...countFromText(catalogue),...countFromText(llms)];
+const uniqueEmbedded=[...new Set(embeddedCounts)];
+if(uniqueEmbedded.length && (uniqueEmbedded.length !== 1 || uniqueEmbedded[0] !== included.length)) throw new Error(`Public project count mismatch: embedded=${uniqueEmbedded.join(',')} manifest=${included.length}.`);
+
+for(const file of htmlFiles){
+  const html=await fs.readFile(file,'utf8');
+  const description=html.match(/<meta name="description" content="([^"]*)">/i)?.[1] || '';
+  const descriptionCounts=countFromText(description);
+  if(descriptionCounts.length && (descriptionCounts.length !== 1 || descriptionCounts[0] !== included.length)) throw new Error(`Meta description count mismatch in ${path.relative(DIST,file)}.`);
+}
+
 const catalogueTotal=Number((catalogue.match(/(\d+) public projects/)||[])[1]);
-const llmsMainCount=main.length;
 const sitemapCount=(sitemap.match(/<url>/g)||[]).length;
 const expectedSitemap=main.length+6;
 if(manifest.total!==included.length || manifest.main!==main.length || manifest.archive!==archive.length || manifest.flagship!==flagships.length) throw new Error('public-manifest.json does not match curation.json.');
 if(catalogueTotal!==included.length) throw new Error(`Catalogue count ${catalogueTotal} does not match manifest ${included.length}.`);
+if(!llms.includes(`Catalogue: ${included.length} public projects`)) throw new Error(`llms.txt count does not match manifest ${included.length}.`);
 if((llms.match(/^###? /gm)||[]).length < 0) throw new Error('Unreachable guard.');
-if(llmsMainCount!==main.length) throw new Error('llms.txt main-project count mismatch.');
 if(sitemapCount!==expectedSitemap) throw new Error(`Sitemap count ${sitemapCount} does not equal expected ${expectedSitemap}.`);
 
 for(const [,p] of archive){ const slug=p.slug || ''; if(sitemap.includes(`/projects/${slug}/`)) throw new Error(`Archive project leaked into sitemap: ${p.name}`); }
