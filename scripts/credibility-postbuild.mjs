@@ -12,6 +12,7 @@ const publicProjects = projects.filter(p => p.include);
 const mainProjects = publicProjects.filter(p => p.tier !== 'archive');
 const archiveProjects = publicProjects.filter(p => p.tier === 'archive');
 const flagships = publicProjects.filter(p => p.tier === 'flagship').sort((a, b) => a.flagship - b.flagship);
+const safeTopics = topics => (Array.isArray(topics) ? topics : []).filter(topic => !/termux|mobile-first/i.test(String(topic)));
 
 const esc = (value = '') => String(value).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const iso = value => value ? new Date(value).toISOString().slice(0, 10) : '';
@@ -38,10 +39,10 @@ function head(title, description, canonical, jsonld, robots='index,follow,max-im
 function shell(title, description, canonical, body, jsonld, robots) {
   return `${head(title,description,canonical,jsonld,robots)}<body><a class="skip" href="#main">Skip to content</a><header class="site-header"><a class="brand" href="${BASE}" aria-label="SYJ LABS home"><span class="mark">SYJ</span><span><strong>SYJ <em>LABS</em></strong><small>BUILD. INNOVATE. DEPLOY.</small></span></a><button type="button" class="menu" aria-expanded="false" aria-controls="nav" aria-label="Open navigation"><span></span><span></span></button><nav id="nav"><a href="${BASE}#projects">Projects</a><a href="${BASE}projects/">Catalogue</a><a href="${BASE}#focus">Focus</a><a href="${BASE}about/">About</a><a href="${BASE}contact/">Contact</a><a class="nav-cta" href="https://github.com/SHalimoosavi" target="_blank" rel="noopener noreferrer">GitHub ↗</a></nav></header><main id="main">${body}</main><footer><a href="${BASE}">SYJ <em>LABS</em></a><span>Independent technology work by Syed Ali Hasan Moosavi.</span><span><a href="${BASE}about/">About</a> · <a href="${BASE}contact/">Contact</a> · <a href="${BASE}open-source/">Open Source</a> · <a href="${BASE}security/">Security</a></span></footer><script src="${BASE}assets/site.js" defer></script></body></html>`;
 }
-
 function card(p, index) {
   const tier = p.tier === 'flagship' ? 'Flagship' : p.tier === 'experimental' ? 'Experimental' : p.tier === 'active' ? 'Active' : 'Archive';
-  return `<article class="card" data-category="${esc(p.category)}" data-language="${esc(p.language)}" data-name="${esc(p.name.toLowerCase())}"><a href="${url(p.slug)}"><img src="${BASE}assets/projects/${p.slug}.webp" alt="${esc(p.name)} project preview" width="960" height="480" loading="lazy" decoding="async"><span class="index">${String(index+1).padStart(2,'0')}</span></a><div><small>${tier} · ${esc(p.category)} · ${esc(p.language)}</small><h3>${esc(p.name)}</h3><p>${esc(p.description)}</p><div class="tags"><span>${esc(p.status || tier.toLowerCase())}</span>${p.topics.slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')}</div><a class="text-link" href="${url(p.slug)}">View project →</a></div></article>`;
+  const topics = safeTopics(p.topics);
+  return `<article class="card" data-category="${esc(p.category)}" data-language="${esc(p.language)}" data-name="${esc(p.name.toLowerCase())}"><a href="${url(p.slug)}"><img src="${BASE}assets/projects/${p.slug}.webp" alt="${esc(p.name)} project preview" width="960" height="480" loading="lazy" decoding="async"><span class="index">${String(index+1).padStart(2,'0')}</span></a><div><small>${tier} · ${esc(p.category)} · ${esc(p.language)}</small><h3>${esc(p.name)}</h3><p>${esc(p.description)}</p><div class="tags"><span>${esc(p.status || tier.toLowerCase())}</span>${topics.slice(0,3).map(t=>`<span>${esc(t)}</span>`).join('')}</div><a class="text-link" href="${url(p.slug)}">View project →</a></div></article>`;
 }
 
 const qa = [
@@ -87,7 +88,7 @@ const details = {
   'syj-gst-reconciliation': { problem:'The README describes supplier and purchase records that need repeatable invoice reconciliation, duplicate detection and validation.', what:'A Python reconciliation tool that loads supplier and purchase workbooks, normalizes data, validates invoices, detects duplicates, matches records and generates multi-sheet Excel reports.', architecture:'The README documents ingestion, cleaning, validation, duplicate detection, composite-key matching, field reconciliation, statistics and report generation, with core, models, utils, docs and tests directories.', evidence:[['README','https://github.com/SHalimoosavi/SYJ-GST-Reconciliation/blob/main/README.md'],['Tests','https://github.com/SHalimoosavi/SYJ-GST-Reconciliation/tree/main/tests'],['CI workflows','https://github.com/SHalimoosavi/SYJ-GST-Reconciliation/tree/main/.github/workflows']], limitations:'The repository documents automated tests and benchmarks; legal/tax correctness still depends on the source data and applicable rules.', status:'Active engineering project.' },
   'syj-launchpad': { problem:'The project is intended to provide a self-hosted Web3 launch platform without coupling the core application to a single EVM chain.', what:'A Web3 launch platform with backend, frontend and Solidity contract workspaces covering authentication, presales, claims and vesting.', architecture:'The README documents a feature-based FastAPI backend, Next.js frontend, Hardhat/OpenZeppelin contracts, chain configuration and PostgreSQL-backed development setup.', evidence:[['README','https://github.com/SHalimoosavi/SYJ-LaunchPad/blob/main/README.md'],['CI workflows','https://github.com/SHalimoosavi/SYJ-LaunchPad/tree/main/.github/workflows'],['Docs','https://github.com/SHalimoosavi/SYJ-LaunchPad/tree/main/docs']], limitations:'The README identifies the repository as Phase 1 foundational architecture; it should not be represented as a finished launch platform.', status:'Phase 1 — foundational architecture.' },
   'syj-llm': { problem:'The project addresses local LLM execution where memory constraints and cloud dependencies matter.', what:'A C/C++ runtime built around llama.cpp and GGUF, with a model registry, memory admission budgeting, CLI execution and an optional localhost HTTP/SSE layer.', architecture:'The README documents a shared Runtime/ModelRegistry core, pinned llama.cpp, an optional HTTP layer, GGUF model storage and CLI/API paths sharing the same core APIs.', evidence:[['README','https://github.com/SHalimoosavi/SYJ-LLM/blob/main/README.md'],['Releases','https://github.com/SHalimoosavi/SYJ-LLM/releases'],['Tests directory','https://github.com/SHalimoosavi/SYJ-LLM/tree/main/tests']], limitations:'The README lists several later capabilities as not implemented, including authentication, remote model synchronization, final model validation, packaging, performance work and a release candidate.', status:'Phase 5 — Fine-Tuning Pipeline.' },
-  'syj-nexusintel-ai-web': { problem:'The README describes fragmented business data, manual lead research and limited revenue visibility as the problem space.', what:'An AI-assisted business intelligence and automation platform combining lead intelligence, analytics, CRM and revenue-oriented workflows.', architecture:'The repository README documents a web application with frontend, backend, database and API components and a set of intelligence engines; exact production architecture should be treated as repository-documented rather than independently verified.', evidence:[['README','https://github.com/SHalimoosavi/SYJ-NexusIntel-AI-web/blob/main/README.md'],['Repository actions','https://github.com/SHalimoosavi/SYJ-NexusIntel-AI-web/actions']], limitations:'The repository README contains strong deployment-status claims, but this site does not independently verify uptime, customer usage or commercial outcomes.', status:'MVP according to the repository documentation.' },
+  'syj-nexusintel-ai-web': { problem:'The README describes fragmented business data, manual lead research and limited revenue visibility as the problem space.', what:'An AI-assisted business intelligence and automation platform combining lead intelligence, analytics, CRM and revenue-oriented workflows.', architecture:'The repository README documents a web application with frontend, backend, database and API components and a set of intelligence engines; exact production architecture should be treated as repository-documented rather than independently verified.', evidence:[['README','https://github.com/SHalimoosavi/SYJ-NexusIntel-AI-web/blob/main/README.md'],['Repository actions','https://github.com/SHalimoosavi/SYJ-NexusIntel-AI-web/actions']], limitations:'The repository README contains deployment-status claims, but this site does not independently verify uptime, customer usage or commercial outcomes.', status:'MVP according to the repository documentation.' },
   'syj-opentrade-logic': { problem:'The README targets explainable international-trade classification without opaque model decisions.', what:'A deterministic HTS classification engine and REST API using GRI-oriented decision logic, with a dependency-light core and supporting FastAPI service.', architecture:'The README separates client, API, core engine and data layers and documents a GRI-based classification flow over an HTS tariff tree.', evidence:[['README','https://github.com/SHalimoosavi/SYJ-OpenTrade-Logic/blob/main/README.md'],['Tests','https://github.com/SHalimoosavi/SYJ-OpenTrade-Logic/tree/main/tests'],['CI','https://github.com/SHalimoosavi/SYJ-OpenTrade-Logic/actions']], limitations:'The repository is active development and its tariff data and classification logic require ongoing maintenance and domain validation.', status:'Active development according to repository README.' },
   'syj-scholar-ai': { problem:'The README describes study workflows involving PDFs, summaries, notes, flashcards and quizzes without requiring a hosted study service.', what:'A study assistant that processes documents into summaries, notes, flashcards, quizzes and exam-preparation material using locally runnable AI components.', architecture:'The README documents a Python entry point, document extraction/OCR, summarization, flashcard, quiz and notes modules, plus model configuration.', evidence:[['README','https://github.com/SHalimoosavi/SYJ-SCHOLAR-AI/blob/main/README.md'],['MIT license','https://github.com/SHalimoosavi/SYJ-SCHOLAR-AI/blob/main/LICENSE'],['Repository actions','https://github.com/SHalimoosavi/SYJ-SCHOLAR-AI/actions']], limitations:'The README contains a forward-looking list of unimplemented features; this project page treats those as planned rather than completed.', status:'Open-source project; repository README documents current and planned capabilities.' }
 };
@@ -99,14 +100,15 @@ for (const p of publicProjects) {
   const archive=p.tier==='archive';
   const metaLicense = p.license ? p.license : null;
   let projectJson;
+  const topics = safeTopics(p.topics);
   if (details[p.slug]) {
     const d=details[p.slug];
     const evidence=d.evidence.map(([label,href])=>`<li><a href="${href}" target="_blank" rel="noopener noreferrer">${esc(label)} ↗</a></li>`).join('');
     const body=`<section class="project-hero"><p class="eyebrow">${esc(p.tier==='flagship'?'FLAGSHIP PROJECT':'PROJECT')} · ${esc(p.category)} · ${esc(p.language)}</p><h1>${esc(p.name)}</h1><p>${esc(p.description)}</p><div class="actions"><a class="button primary" href="${esc(p.html_url)}" target="_blank" rel="noopener noreferrer">Open repository ↗</a>${p.homepage?`<a class="button" href="${esc(p.homepage)}" target="_blank" rel="noopener noreferrer">Live site ↗</a>`:''}</div></section><section class="section answer"><h2>Problem</h2><p>${esc(d.problem)}</p><h2>What it does</h2><p>${esc(d.what)}</p><h2>Architecture</h2><p>${esc(d.architecture)}</p><h2>Current implementation</h2><p>${esc(p.description)}</p><h2>Evidence</h2><ul>${evidence}</ul><h2>Limitations</h2><p>${esc(d.limitations)}</p><h2>Status</h2><p>${esc(d.status)}</p><p>License: ${esc(metaLicense || 'No license file')}</p><p><a class="text-link" href="${esc(p.html_url)}" target="_blank" rel="noopener noreferrer">Repository and source history →</a></p></section>`;
-    projectJson={'@context':'https://schema.org','@graph':[org,person,{'@type':'SoftwareSourceCode','@id':`${url(p.slug)}#software`,name:p.name,description:p.description,url:p.html_url,codeRepository:p.html_url,programmingLanguage:p.language,keywords:p.topics,dateModified:iso(p.pushed_at),...(metaLicense?{license:metaLicense}:{})}]};
+    projectJson={'@context':'https://schema.org','@graph':[org,person,{'@type':'SoftwareSourceCode','@id':`${url(p.slug)}#software`,name:p.name,description:p.description,url:p.html_url,codeRepository:p.html_url,programmingLanguage:p.language,keywords:topics,dateModified:iso(p.pushed_at),...(metaLicense?{license:metaLicense}:{})}]};
     html=html.replace(/<main id="main">[\s\S]*?<\/main>/,`<main id="main">${body}</main>`);
   } else {
-    projectJson={'@context':'https://schema.org','@graph':[org,person,{'@type':'SoftwareSourceCode','@id':`${url(p.slug)}#software`,name:p.name,description:p.description,url:p.html_url,codeRepository:p.html_url,programmingLanguage:p.language,keywords:p.topics,dateModified:iso(p.pushed_at),...(metaLicense?{license:metaLicense}:{})}]};
+    projectJson={'@context':'https://schema.org','@graph':[org,person,{'@type':'SoftwareSourceCode','@id':`${url(p.slug)}#software`,name:p.name,description:p.description,url:p.html_url,codeRepository:p.html_url,programmingLanguage:p.language,keywords:topics,dateModified:iso(p.pushed_at),...(metaLicense?{license:metaLicense}:{})}]};
     html=html.replace(/<dt>License<\/dt>\s*<dd>[\s\S]*?<\/dd>/,`<dt>License</dt><dd>${esc(metaLicense || 'No license file')}</dd>`);
   }
   html=html.replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/,`<script type="application/ld+json">${JSON.stringify(projectJson)}</script>`);
@@ -135,11 +137,47 @@ const group=(title,list)=>`${title}\n${list.length?list.map(p=>`- ${p.name} | ${
 await fs.writeFile(path.join(DIST,'llms.txt'),llmsHeader+group('Flagship 8',flagships)+group('Active',publicProjects.filter(p=>p.tier==='active'))+group('Experimental',publicProjects.filter(p=>p.tier==='experimental')));
 await fs.writeFile(path.join(DIST,'llms-full.txt'),llmsHeader+group('Flagship 8',flagships)+group('Active',publicProjects.filter(p=>p.tier==='active'))+group('Experimental',publicProjects.filter(p=>p.tier==='experimental'))+group('Archive',archiveProjects));
 
+function contextAround(text, index, width=80) {
+  const start=Math.max(0,index-Math.floor(width/2));
+  const end=Math.min(text.length,start+width);
+  return text.slice(start,end).replace(/\s+/g,' ').trim();
+}
+function fieldMatches(text, term) {
+  const out=[];
+  const re=new RegExp(term,'gi');
+  const add=(field,source)=>{let m;while((m=re.exec(source))){const offset=text.indexOf(source);out.push({term:m[0],field,context:contextAround(text,offset+m.index)});}};
+  const title=text.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||'';
+  add('title',title);
+  for(const [field,attr,name] of [['meta description','name','description'],['og:title','property','og:title'],['og:description','property','og:description'],['twitter:title','name','twitter:title'],['twitter:description','name','twitter:description'],['keywords','name','keywords']]){
+    const rx=new RegExp(`<meta[^>]+${attr}=["']${name}["'][^>]+content=["']([\\s\\S]*?)["'][^>]*>`,'i');
+    const value=rx.exec(text)?.[1]||'';
+    add(field,value);
+  }
+  const jsonBlocks=[...text.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)];
+  for(const block of jsonBlocks){
+    const json=block[1];
+    const keys=['keywords','description','name','jobTitle','sameAs'];
+    for(const key of keys){
+      const rx=new RegExp(`"${key}"\\s*:\\s*"?([^",}\\]]+)`,'i');
+      const value=rx.exec(json)?.[1]||'';
+      add(`JSON-LD field ${key}`,value);
+    }
+  }
+  const body=text.replace(/<script[\s\S]*?<\/script>/gi,' ').replace(/<style[\s\S]*?<\/style>/gi,' ').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ');
+  add('visible body text',body);
+  return out;
+}
+
 const forbidden=[];
 const files=[];
 async function walk(dir){for(const entry of await fs.readdir(dir,{withFileTypes:true})){const full=path.join(dir,entry.name);if(entry.isDirectory()) await walk(full);else if(/\.(html|txt|xml|json|js|css)$/.test(entry.name)) files.push(full);}}
 await walk(DIST);
-for(const file of files){const text=await fs.readFile(file,'utf8');if(/termux|mobile-first/i.test(text)) forbidden.push(`${file}: prohibited terminology`);if(/NOASSERTION/i.test(text)) forbidden.push(`${file}: NOASSERTION`);if(/<html/.test(text)&&(!/<link rel="canonical"/.test(text)||!/<meta property="og:title"/.test(text)||!/<meta name="twitter:card"/.test(text))) forbidden.push(`${file}: missing canonical/OG/Twitter metadata`);}
+for(const file of files){
+  const text=await fs.readFile(file,'utf8');
+  for(const term of ['termux','mobile-first']) for(const hit of fieldMatches(text,term)) forbidden.push(`${file}: matched "${hit.term}" in ${hit.field} | context: ${hit.context}`);
+  if(/NOASSERTION/i.test(text)) forbidden.push(`${file}: NOASSERTION`);
+  if(/<html/.test(text)&&(!/<link rel="canonical"/.test(text)||!/<meta property="og:title"/.test(text)||!/<meta name="twitter:card"/.test(text))) forbidden.push(`${file}: missing canonical/OG/Twitter metadata`);
+}
 if(forbidden.length){throw new Error(`Credibility guards failed:\n${forbidden.join('\n')}`);}
 await fs.writeFile('data/public-manifest.json',JSON.stringify({generatedAt:new Date().toISOString(),total:publicProjects.length,main:mainProjects.length,archive:archiveProjects.length,flagship:flagships.length,projects:publicProjects.map(p=>({name:p.name,tier:p.tier,slug:p.slug,status:p.status}))},null,2)+'\n');
 console.log(`Credibility post-build complete: ${publicProjects.length} public / ${mainProjects.length} main / ${archiveProjects.length} archive / ${flagships.length} flagship.`);
