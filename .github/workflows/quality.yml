@@ -98,3 +98,50 @@ jobs:
         run: npx http-server dist -p 4173 -c-1 > /tmp/syj-http.log 2>&1 &
       - name: Run Lighthouse three times
         run: npx lhci autorun --config=lighthouserc.pr.${{ matrix.mode }}.json
+      - name: Report Lighthouse medians and failing audits
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const files = fs.existsSync('.lighthouseci')
+            ? fs.readdirSync('.lighthouseci').filter(name => name.endsWith('.json'))
+            : [];
+          const reports = [];
+          for (const name of files) {
+            try {
+              const report = JSON.parse(fs.readFileSync(path.join('.lighthouseci', name), 'utf8'));
+              if (report.requestedUrl && report.categories) reports.push(report);
+            } catch {}
+          }
+          const median = values => {
+            const sorted = values.filter(Number.isFinite).sort((a,b)=>a-b);
+            if (!sorted.length) return null;
+            const middle = Math.floor(sorted.length / 2);
+            return sorted.length % 2 ? sorted[middle] : (sorted[middle-1] + sorted[middle]) / 2;
+          };
+          const urls = [...new Set(reports.map(r => r.requestedUrl))];
+          for (const url of urls) {
+            const rows = reports.filter(r => r.requestedUrl === url);
+            const performance = median(rows.map(r => r.categories.performance?.score));
+            const accessibility = median(rows.map(r => r.categories.accessibility?.score));
+            const best = median(rows.map(r => r.categories['best-practices']?.score));
+            const seo = median(rows.map(r => r.categories.seo?.score));
+            console.log(`Lighthouse median | ${url} | performance=${performance ?? 'unverified'} accessibility=${accessibility ?? 'unverified'} best-practices=${best ?? 'unverified'} seo=${seo ?? 'unverified'}`);
+            const auditValues = new Map();
+            for (const report of rows) {
+              for (const [id, audit] of Object.entries(report.audits || {})) {
+                if (typeof audit.score === 'number') {
+                  if (!auditValues.has(id)) auditValues.set(id, []);
+                  auditValues.get(id).push(audit.score);
+                }
+              }
+            }
+            const failing = [];
+            for (const [id, scores] of auditValues) {
+              const score = median(scores);
+              if (score !== null && score < 0.9) failing.push(`${id}=${score}`);
+            }
+            console.log(`Performance-related audit candidates below 0.90 | ${url} | ${failing.join(', ') || 'none'}`);
+          }
+          NODE
