@@ -11,11 +11,9 @@ const clean = value => String(value ?? '')
   .replace(/\s+/g, ' ')
   .trim();
 
-const hidden = new Set();
-for (const [name, entry] of Object.entries(data.repositories || {})) {
+for (const entry of Object.values(data.repositories || {})) {
   entry.description = clean(entry.description);
   entry.tier ||= entry.flagship ? 'flagship' : 'archive';
-  if (entry.tier === 'archive' && entry.include === false) hidden.add(name);
   if (entry.flagship) entry.tier = 'flagship';
   entry.status = entry.tier === 'archive' ? 'archive' : entry.tier === 'experimental' ? 'experimental' : 'active';
 }
@@ -31,4 +29,4 @@ for (const entry of Object.values(data.repositories || {})) {
 
 data.generatedAt = new Date().toISOString();
 await fs.writeFile(file, JSON.stringify(data, null, 2) + '\n');
-console.log(`Catalogue prepared: ${Object.values(data.repositories || {}).filter(x => x.include).length} included.`);
+console.log(`Catalogue curation prepared: ${Object.keys(data.repositories || {}).length} repository entries. Final public count is computed from the generated GitHub inventory.`);
