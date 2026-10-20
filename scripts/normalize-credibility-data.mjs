@@ -2,6 +2,7 @@ import fs from 'node:fs/promises';
 
 const curationPath = 'data/curation.json';
 const projectsPath = 'data/projects.json';
+const classificationPath = 'data/credibility-classification.json';
 
 const curation = JSON.parse(await fs.readFile(curationPath, 'utf8'));
 const projects = JSON.parse(await fs.readFile(projectsPath, 'utf8'));
@@ -65,5 +66,6 @@ for (const [name, entry] of Object.entries(curation.repositories || {})) {
 
 await fs.writeFile(curationPath, JSON.stringify(curation, null, 2) + '\n');
 await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2) + '\n');
+await fs.writeFile(classificationPath, JSON.stringify(curation, null, 2) + '\n');
 
-console.log('Credibility data normalized: default tier=archive; prohibited project metadata filtered; NOASSERTION removed.');
+console.log('Credibility data normalized: default tier=archive; prohibited project metadata filtered; NOASSERTION removed; final classification snapshot preserved.');
