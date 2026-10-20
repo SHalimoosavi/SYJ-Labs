@@ -1,9 +1,10 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-const DIST = path.join(process.cwd(), 'dist');
-const curation = JSON.parse(await fs.readFile('data/curation.json','utf8'));
-const manifest = JSON.parse(await fs.readFile(path.join(DIST,'data/public-manifest.json'),'utf8'));
+const ROOT = process.cwd();
+const DIST = path.join(ROOT, 'dist');
+const curation = JSON.parse(await fs.readFile(path.join(ROOT,'data/curation.json'),'utf8'));
+const manifest = JSON.parse(await fs.readFile(path.join(ROOT,'data/public-manifest.json'),'utf8'));
 const projects = curation.repositories || {};
 const included = Object.entries(projects).filter(([,p]) => p.include);
 const main = included.filter(([,p]) => p.tier !== 'archive');
@@ -63,9 +64,7 @@ const expectedSitemap=main.length+6;
 if(manifest.total!==included.length || manifest.main!==main.length || manifest.archive!==archive.length || manifest.flagship!==flagships.length) throw new Error('public-manifest.json does not match curation.json.');
 if(catalogueTotal!==included.length) throw new Error(`Catalogue count ${catalogueTotal} does not match manifest ${included.length}.`);
 if(!llms.includes(`Catalogue: ${included.length} public projects`)) throw new Error(`llms.txt count does not match manifest ${included.length}.`);
-if((llms.match(/^###? /gm)||[]).length < 0) throw new Error('Unreachable guard.');
 if(sitemapCount!==expectedSitemap) throw new Error(`Sitemap count ${sitemapCount} does not equal expected ${expectedSitemap}.`);
-
 for(const [,p] of archive){ const slug=p.slug || ''; if(sitemap.includes(`/projects/${slug}/`)) throw new Error(`Archive project leaked into sitemap: ${p.name}`); }
 
 console.log(`credibility verification passed | public=${included.length} main=${main.length} archive=${archive.length} flagship=${flagships.length} sitemap=${sitemapCount}`);
