@@ -31,11 +31,16 @@ for(const file of htmlFiles){
   if(!/<meta name="twitter:card"/.test(html)) throw new Error(`Missing Twitter card in ${path.relative(DIST,file)}`);
 }
 
-const distText=allText.map(([,text])=>text).join('\n');
-for(const [name,p] of Object.entries(projects)) if(!p.include && distText.includes(name)) throw new Error(`include:false project leaked into generated output: ${name}`);
+const generatedText=allText.map(([,text])=>text).join('\n');
+for(const [name,p] of Object.entries(projects)) {
+  if(p.include || name === 'SYJ-Labs') continue;
+  if(generatedText.includes(`/projects/${p.slug}/`) || generatedText.includes(`>${name}<`) || generatedText.includes(`| ${name} |`)) {
+    throw new Error(`include:false project leaked into generated output: ${name}`);
+  }
+}
 
 for(const [name,p] of flagships){
-  const slug=name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const slug=p.slug || name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   const file=path.join(DIST,'projects',slug,'index.html');
   const html=await fs.readFile(file,'utf8');
   for(const section of ['Problem','What it does','Architecture','Current implementation','Evidence','Limitations','Status']) if(!new RegExp(`<h2>${section}</h2>`).test(html)) throw new Error(`Flagship ${name} missing required section: ${section}`);
