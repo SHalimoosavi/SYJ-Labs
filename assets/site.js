@@ -50,6 +50,7 @@
   let expanded = false;
   let loaded = false;
   let loading = null;
+  let firstApply = true;
 
   const tierLabel = tier => tier === 'flagship' ? 'Flagship' : tier === 'experimental' ? 'Experimental' : tier === 'active' ? 'Active' : 'Archive';
   const createCard = (project, index) => {
@@ -127,12 +128,20 @@
       return Number(b.dataset.stars || 0) - Number(a.dataset.stars || 0);
     });
 
-    cards.forEach(card => { card.hidden = true; });
     const display = filtering || expanded ? matching : matching.slice(0, initialLimit);
-    display.forEach(card => {
-      card.hidden = false;
-      grid.appendChild(card);
-    });
+
+    if (firstApply) {
+      // Keep the server-rendered order stable on first paint. Only hide cards
+      // outside the initial set; do not reorder or collapse the grid.
+      cards.forEach((card, index) => { card.hidden = index >= display.length; });
+      firstApply = false;
+    } else {
+      cards.forEach(card => { card.hidden = true; });
+      display.forEach(card => {
+        card.hidden = false;
+        grid.appendChild(card);
+      });
+    }
 
     if (loadMore) loadMore.hidden = filtering || expanded || matching.length <= initialLimit;
     if (status) {
