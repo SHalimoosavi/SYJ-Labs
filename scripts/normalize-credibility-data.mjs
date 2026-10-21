@@ -14,7 +14,10 @@ const projects = JSON.parse(await fs.readFile(projectsPath, 'utf8'));
 const descriptionOverrides = {
   'SYJ-AI': 'Open-source local-first autonomous AI software engineering agent that runs offline through Ollama across Android, Linux, Windows, and macOS.',
   'SYJ-Nexus-Event-Trace': 'A local-first webhook event sink and logger that captures, verifies, stores, and replays webhooks in SQLite. Runs with Node.js on Linux, Windows, macOS, and Android.',
-  'SYJ-Nexus-Sentinel-Audit': 'A cross-platform security observability daemon that monitors local network devices, flags unrecognized devices against a whitelist, and generates daily audit reports.'
+  'SYJ-Nexus-Sentinel-Audit': 'A cross-platform security observability daemon that monitors local network devices, flags unrecognized devices against a whitelist, and generates daily audit reports.',
+  'sayanjali-osint': 'OSINT and geolocation framework for collecting, correlating and reporting publicly available intelligence from network and location data sources.',
+  'SYJ-GST-Reconciliation': 'Offline GST invoice reconciliation tool for Indian SMEs, CAs and accountants that cross-verifies supplier invoices against purchase records.',
+  'SYJ-SCHOLAR-AI': 'Open-source study assistant that turns documents into summaries, notes, flashcards, quizzes and exam-preparation material using locally runnable AI.'
 };
 
 const asApiLicense = value => {
@@ -104,12 +107,12 @@ try {
     for (const project of dist.projects) {
       const normalized = normalizedByName.get(project.name);
       if (!normalized) continue;
-      project.licenseApi = normalized.licenseApi;
       project.license = normalized.license;
+      delete project.licenseApi;
       if (Array.isArray(normalized.topics)) project.topics = normalized.topics;
     }
     await fs.writeFile(distProjectsPath, JSON.stringify(dist, null, 2) + '\n');
   }
 } catch {}
 
-console.log('Credibility data normalized: license API values retained, NOASSERTION mapped to a display-safe label, prohibited project metadata filtered, generated tiers preserved, and hidden projects removed from generated data.');
+console.log('Credibility data normalized: license API values retained in source manifests, display-safe license text emitted to public data, prohibited project metadata filtered, generated tiers preserved, and hidden projects removed from generated data.');
