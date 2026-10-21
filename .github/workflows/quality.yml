@@ -147,5 +147,12 @@ jobs:
             for (const item of candidates.slice(0,12)) {
               console.log(`  ${item.id} | ${item.title} | score=${item.score ?? 'unverified'} | savings_ms=${item.savings ?? 'unverified'}`);
             }
+            const medianReport = rows[Math.floor(rows.length / 2)];
+            for (const id of ['cls-culprits-insight','layout-shifts']) {
+              const audit = medianReport?.audits?.[id];
+              if (!audit?.details?.items) continue;
+              console.log(`Diagnostic detail | ${url} | ${id}`);
+              console.log(JSON.stringify(audit.details.items.slice(0,12), null, 2));
+            }
           }
           NODE
