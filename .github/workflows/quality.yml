@@ -30,6 +30,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
+      - name: Test license mapping fixture
+        run: npm run test:license-mapping
       - run: npm run build
       - run: npm run verify:dist
       - run: npm run validate:html
