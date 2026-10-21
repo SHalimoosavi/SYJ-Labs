@@ -50,7 +50,6 @@
   let expanded = false;
   let loaded = false;
   let loading = null;
-  let firstApply = true;
 
   const tierLabel = tier => tier === 'flagship' ? 'Flagship' : tier === 'experimental' ? 'Experimental' : tier === 'active' ? 'Active' : 'Archive';
   const createCard = (project, index) => {
@@ -130,19 +129,15 @@
 
     const display = filtering || expanded ? matching : matching.slice(0, initialLimit);
 
-    if (filtering || expanded) cards.forEach(card => { card.style.display = ''; });
-
-    if (firstApply) {
-      cards.forEach((card, index) => { card.hidden = index >= display.length; });
-      firstApply = false;
-    } else {
-      cards.forEach(card => { card.hidden = true; });
-      display.forEach(card => {
-        card.hidden = false;
-        card.style.display = '';
-        grid.appendChild(card);
-      });
-    }
+    cards.forEach(card => {
+      card.hidden = true;
+      card.style.display = '';
+    });
+    display.forEach(card => {
+      card.hidden = false;
+      card.style.display = '';
+      grid.appendChild(card);
+    });
 
     if (loadMore) loadMore.hidden = filtering || expanded || matching.length <= initialLimit;
     if (status) {
@@ -173,5 +168,6 @@
     });
   });
 
-  apply();
+  // Initial catalogue state is fully server-rendered. The build hides cards
+  // after the first 12 in static HTML, so there is no first-paint mutation.
 })();
