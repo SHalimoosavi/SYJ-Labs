@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { licenseDisplay } from './license-mapping.mjs';
 
 const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
@@ -62,12 +63,6 @@ async function githubLicense(name) {
   }
 }
 
-const displayLicense = apiLicense => {
-  if (!apiLicense) return 'No license file';
-  if (String(apiLicense).toUpperCase() === 'NOASSERTION') return 'License file present but not recognised';
-  return String(apiLicense);
-};
-
 async function walk(dir, out = []) {
   for (const entry of await fs.readdir(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
@@ -98,16 +93,20 @@ for (const file of htmlFiles) {
 for (const [name, p] of included) {
   const manifestProject = projectByName.get(name);
   if (!manifestProject) throw new Error(`Included repo missing from project manifest: ${name}`);
+  if (!Object.prototype.hasOwnProperty.call(manifestProject, 'licenseApi')) throw new Error(`License API field missing for ${name}.`);
+  if (!Object.prototype.hasOwnProperty.call(manifestProject, 'licenseDisplay')) throw new Error(`License display field missing for ${name}.`);
+
   const apiLicense = await githubLicense(name);
   const manifestApi = manifestProject.licenseApi ?? null;
   if ((manifestApi || null) !== (apiLicense || null)) throw new Error(`License API mismatch for ${name}: manifest=${manifestApi || 'null'} github=${apiLicense || 'null'}.`);
-  const expectedPageLicense = displayLicense(apiLicense);
+  const expectedPageLicense = licenseDisplay(apiLicense);
+  if (manifestProject.licenseDisplay !== expectedPageLicense) throw new Error(`License display mismatch for ${name}: manifest=${manifestProject.licenseDisplay || 'missing'} expected=${expectedPageLicense}.`);
+
   const slug = manifestProject.slug || p.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const file = path.join(DIST, 'projects', slug, 'index.html');
   const html = await fs.readFile(file, 'utf8');
   const pageLicense = html.match(/<dt>License<\/dt>\s*<dd>([\s\S]*?)<\/dd>/i)?.[1]?.replace(/<[^>]+>/g, '').trim() || html.match(/License:\s*([^<\n]+)/i)?.[1]?.trim() || '';
-  if (pageLicense !== expectedPageLicense) throw new Error(`License page mismatch for ${name}: page=${pageLicense || 'missing'} manifest=${expectedPageLicense}.`);
-  if (manifestProject.license !== expectedPageLicense) throw new Error(`License display mismatch for ${name}: manifest=${manifestProject.license || 'missing'} expected=${expectedPageLicense}.`);
+  if (pageLicense !== expectedPageLicense) throw new Error(`License page mismatch for ${name}: page=${pageLicense || 'missing'} expected=${expectedPageLicense}.`);
 }
 
 const generatedText = allText.map(([, text]) => text).join('\n');
