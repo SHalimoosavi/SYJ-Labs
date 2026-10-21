@@ -1,12 +1,11 @@
 import fs from 'node:fs/promises';
+import { asApiLicense, licenseDisplay } from './license-mapping.mjs';
 
 const curationPath = 'data/curation.json';
 const projectsPath = 'data/projects.json';
 const classificationPath = 'data/credibility-classification.json';
 const distProjectsPath = 'dist/data/projects.json';
-
-const NO_LICENSE_FILE = 'No license file';
-const UNRECOGNISED_LICENSE = 'License file present but not recognised';
+const distManifestPath = 'dist/data/public-manifest.json';
 
 const curation = JSON.parse(await fs.readFile(curationPath, 'utf8'));
 const projects = JSON.parse(await fs.readFile(projectsPath, 'utf8'));
@@ -18,19 +17,6 @@ const descriptionOverrides = {
   'sayanjali-osint': 'OSINT and geolocation framework for collecting, correlating and reporting publicly available intelligence from network and location data sources.',
   'SYJ-GST-Reconciliation': 'Offline GST invoice reconciliation tool for Indian SMEs, CAs and accountants that cross-verifies supplier invoices against purchase records.',
   'SYJ-SCHOLAR-AI': 'Open-source study assistant that turns documents into summaries, notes, flashcards, quizzes and exam-preparation material using locally runnable AI.'
-};
-
-const asApiLicense = value => {
-  if (!value) return null;
-  if (typeof value === 'object') return value.spdx_id || value.name || null;
-  return String(value).trim() || null;
-};
-
-const licenseDisplay = value => {
-  const apiLicense = asApiLicense(value);
-  if (!apiLicense) return NO_LICENSE_FILE;
-  if (apiLicense.toUpperCase() === 'NOASSERTION') return UNRECOGNISED_LICENSE;
-  return apiLicense;
 };
 
 const cleanDescription = value => String(value ?? '')
@@ -59,7 +45,7 @@ for (const project of projects.projects || []) {
   const apiLicense = asApiLicense(
     entry.licenseApi ?? project.licenseApi ?? project.license ?? entry.license ?? null
   );
-  const displayLicense = apiLicense ? licenseDisplay(apiLicense) : null;
+  const displayLicense = licenseDisplay(apiLicense);
 
   if (descriptionOverrides[project.name]) project.description = descriptionOverrides[project.name];
   else project.description = cleanDescription(project.description);
@@ -69,12 +55,14 @@ for (const project of projects.projects || []) {
   }
 
   project.licenseApi = apiLicense;
+  project.licenseDisplay = displayLicense;
   project.license = displayLicense;
   normalizedByName.set(project.name, project);
 
   curation.repositories ||= {};
   curation.repositories[project.name] ||= {};
   curation.repositories[project.name].licenseApi = apiLicense;
+  curation.repositories[project.name].licenseDisplay = displayLicense;
   curation.repositories[project.name].license = displayLicense;
 }
 
@@ -84,7 +72,8 @@ for (const [name, entry] of Object.entries(curation.repositories || {})) {
   if (descriptionOverrides[name]) entry.description = descriptionOverrides[name];
   const apiLicense = asApiLicense(entry.licenseApi ?? entry.license ?? null);
   entry.licenseApi = apiLicense;
-  entry.license = apiLicense ? licenseDisplay(apiLicense) : null;
+  entry.licenseDisplay = licenseDisplay(apiLicense);
+  entry.license = entry.licenseDisplay;
   if (!entry.tier) {
     entry.tier = entry.flagship
       ? 'flagship'
@@ -107,12 +96,24 @@ try {
     for (const project of dist.projects) {
       const normalized = normalizedByName.get(project.name);
       if (!normalized) continue;
-      project.license = normalized.license;
-      delete project.licenseApi;
+      project.licenseApi = normalized.licenseApi;
+      project.licenseDisplay = normalized.licenseDisplay;
+      project.license = normalized.licenseDisplay;
       if (Array.isArray(normalized.topics)) project.topics = normalized.topics;
     }
     await fs.writeFile(distProjectsPath, JSON.stringify(dist, null, 2) + '\n');
   }
+
+  const manifest = JSON.parse(await fs.readFile(distManifestPath, 'utf8'));
+  if (Array.isArray(manifest.projects)) {
+    for (const project of manifest.projects) {
+      const normalized = normalizedByName.get(project.name);
+      if (!normalized) continue;
+      project.licenseApi = normalized.licenseApi;
+      project.licenseDisplay = normalized.licenseDisplay;
+    }
+    await fs.writeFile(distManifestPath, JSON.stringify(manifest, null, 2) + '\n');
+  }
 } catch {}
 
-console.log('Credibility data normalized: license API values retained in source manifests, display-safe license text emitted to public data, prohibited project metadata filtered, generated tiers preserved, and hidden projects removed from generated data.');
+console.log('Credibility data normalized: every manifest project has explicit licenseApi and licenseDisplay, public license text is display-safe, prohibited project metadata is filtered, generated tiers are preserved, and hidden projects are removed from generated data.');
