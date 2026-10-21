@@ -16,6 +16,8 @@ env:
 jobs:
   static:
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v5
       - name: Install ImageMagick
@@ -29,8 +31,6 @@ jobs:
           cache: npm
       - run: npm ci --no-audit --no-fund
       - run: npm run build
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
       - run: npm run verify:dist
       - run: npm run validate:html
       - name: Prepare local link validation copy
