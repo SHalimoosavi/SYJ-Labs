@@ -3,9 +3,13 @@ import path from 'node:path';
 
 const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
+const OWNER = 'SHalimoosavi';
+const API = 'https://api.github.com';
 const curation = JSON.parse(await fs.readFile(path.join(ROOT,'data/curation.json'),'utf8'));
 const manifest = JSON.parse(await fs.readFile(path.join(ROOT,'data/public-manifest.json'),'utf8'));
+const projectManifest = JSON.parse(await fs.readFile(path.join(ROOT,'data/projects.json'),'utf8'));
 const projects = curation.repositories || {};
+const projectByName = new Map((projectManifest.projects || []).map(project => [project.name, project]));
 const included = Object.entries(projects).filter(([,p]) => p.include);
 const main = included.filter(([,p]) => p.tier !== 'archive');
 const archive = included.filter(([,p]) => p.tier === 'archive');
@@ -13,6 +17,11 @@ const flagships = included.filter(([,p]) => p.tier === 'flagship').sort((a,b)=>(
 
 if (Object.values(projects).some(p => !['flagship','active','experimental','archive'].includes(p.tier))) throw new Error('Every curation entry must have a valid tier.');
 if (flagships.length !== 8) throw new Error(`Expected 8 flagships, found ${flagships.length}.`);
+
+const headers={Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','User-Agent':'SYJ-Labs-credibility-verify'};if(process.env.GITHUB_TOKEN)headers.Authorization=`Bearer ${process.env.GITHUB_TOKEN}`;
+async function getJson(url){const r=await fetch(url,{headers});if(!r.ok)throw new Error(`${r.status} ${r.statusText}: ${url}`);return r.json();}
+async function githubLicense(name){try{const data=await getJson(`${API}/repos/${OWNER}/${name}/license`);return data?.license?.spdx_id || data?.license?.name || null;}catch(error){if(error.message.startsWith('404'))return null;throw error;}}
+const displayLicense=apiLicense=>!apiLicense?'No license file':String(apiLicense).toUpperCase()==='NOASSERTION'?'License file present but not recognised':String(apiLicense);
 
 async function walk(dir, out=[]) { for (const entry of await fs.readdir(dir,{withFileTypes:true})) { const full=path.join(dir,entry.name); if(entry.isDirectory()) await walk(full,out); else out.push(full); } return out; }
 const files=await walk(DIST);
@@ -29,6 +38,21 @@ for(const file of htmlFiles){
   if(!/<link rel="canonical"/.test(html)) throw new Error(`Missing canonical in ${path.relative(DIST,file)}`);
   if(!/<meta property="og:title"/.test(html)) throw new Error(`Missing OG title in ${path.relative(DIST,file)}`);
   if(!/<meta name="twitter:card"/.test(html)) throw new Error(`Missing Twitter card in ${path.relative(DIST,file)}`);
+}
+
+for(const [name,p] of included){
+  const manifestProject=projectByName.get(name);
+  if(!manifestProject) throw new Error(`Included repo missing from project manifest: ${name}`);
+  const apiLicense=await githubLicense(name);
+  const manifestApi=manifestProject.licenseApi ?? null;
+  if((manifestApi||null)!==(apiLicense||null)) throw new Error(`License API mismatch for ${name}: manifest=${manifestApi||'null'} github=${apiLicense||'null'}.`);
+  const expectedPageLicense=displayLicense(apiLicense);
+  const slug=manifestProject.slug || p.slug || name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const file=path.join(DIST,'projects',slug,'index.html');
+  const html=await fs.readFile(file,'utf8');
+  const pageLicense=html.match(/<dt>License<\/dt>\s*<dd>([\s\S]*?)<\/dd>/i)?.[1]?.replace(/<[^>]+>/g,'').trim() || html.match(/License:\s*([^<\n]+)/i)?.[1]?.trim() || '';
+  if(pageLicense!==expectedPageLicense) throw new Error(`License page mismatch for ${name}: page=${pageLicense||'missing'} manifest=${expectedPageLicense}.`);
+  if(manifestProject.license!==expectedPageLicense) throw new Error(`License display mismatch for ${name}: manifest=${manifestProject.license||'missing'} expected=${expectedPageLicense}.`);
 }
 
 const generatedText=allText.map(([,text])=>text).join('\n');
@@ -72,4 +96,4 @@ if(!llms.includes(`Catalogue: ${included.length} public projects`)) throw new Er
 if(sitemapCount!==expectedSitemap) throw new Error(`Sitemap count ${sitemapCount} does not equal expected ${expectedSitemap}.`);
 for(const [,p] of archive){ const slug=p.slug || ''; if(sitemap.includes(`/projects/${slug}/`)) throw new Error(`Archive project leaked into sitemap: ${p.name}`); }
 
-console.log(`credibility verification passed | public=${included.length} main=${main.length} archive=${archive.length} flagship=${flagships.length} sitemap=${sitemapCount}`);
+console.log(`credibility verification passed | public=${included.length} main=${main.length} archive=${archive.length} flagship=${flagships.length} licenses=${included.length}`);
