@@ -130,6 +130,8 @@
 
     const display = filtering || expanded ? matching : matching.slice(0, initialLimit);
 
+    if (filtering || expanded) cards.forEach(card => { card.style.display = ''; });
+
     if (firstApply) {
       cards.forEach((card, index) => { card.hidden = index >= display.length; });
       firstApply = false;
@@ -137,6 +139,7 @@
       cards.forEach(card => { card.hidden = true; });
       display.forEach(card => {
         card.hidden = false;
+        card.style.display = '';
         grid.appendChild(card);
       });
     }
@@ -170,8 +173,5 @@
     });
   });
 
-  // Hide cards outside the initial set before the first render pass. The
-  // filter/search code will reveal them when needed without a layout jump.
-  initialCards.slice(initialLimit).forEach(card => { card.hidden = true; });
   apply();
 })();
