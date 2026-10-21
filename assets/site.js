@@ -12,8 +12,8 @@
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && nav.classList.contains('open')) {
         nav.classList.remove('open');
-        menu.setAttribute('aria-expanded', 'false');
-        menu.setAttribute('aria-label', 'Open navigation');
+        nav.setAttribute('aria-expanded', 'false');
+        nav.setAttribute('aria-label', 'Open navigation');
         menu.focus();
       }
     });
@@ -52,7 +52,6 @@
   let loading = null;
 
   const tierLabel = tier => tier === 'flagship' ? 'Flagship' : tier === 'experimental' ? 'Experimental' : tier === 'active' ? 'Active' : 'Archive';
-  const cleanTopics = topics => Array.isArray(topics) ? topics.filter(topic => !/termux|mobile-first/i.test(String(topic))) : [];
   const createCard = (project, index) => {
     const article = document.createElement('article');
     article.className = 'card';
