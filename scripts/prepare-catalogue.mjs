@@ -11,8 +11,12 @@ const clean = value => String(value ?? '')
   .replace(/\s+/g, ' ')
   .trim();
 
+const safeTopics = value => (Array.isArray(value) ? value : [])
+  .filter(topic => !/termux|mobile-first/i.test(String(topic)));
+
 for (const entry of Object.values(data.repositories || {})) {
   entry.description = clean(entry.description);
+  entry.topics = safeTopics(entry.topics);
   entry.tier ||= entry.flagship ? 'flagship' : 'archive';
   if (entry.flagship) entry.tier = 'flagship';
   entry.status = entry.tier === 'archive' ? 'archive' : entry.tier === 'experimental' ? 'experimental' : 'active';
@@ -28,5 +32,6 @@ for (const entry of Object.values(data.repositories || {})) {
 }
 
 data.generatedAt = new Date().toISOString();
+const publicCount = Object.values(data.repositories || {}).filter(entry => entry.include).length;
 await fs.writeFile(file, JSON.stringify(data, null, 2) + '\n');
-console.log(`Catalogue curation prepared: ${Object.keys(data.repositories || {}).length} repository entries. Final public count is computed from the generated GitHub inventory.`);
+console.log(`Catalogue curation prepared: ${publicCount} included projects from ${Object.keys(data.repositories || {}).length} repository entries.`);
