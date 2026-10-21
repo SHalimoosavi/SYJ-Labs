@@ -120,6 +120,7 @@ jobs:
             const middle = Math.floor(sorted.length / 2);
             return sorted.length % 2 ? sorted[middle] : (sorted[middle-1] + sorted[middle]) / 2;
           };
+          const metric = (rows, id) => median(rows.map(r => r.audits?.[id]?.numericValue));
           const urls = [...new Set(reports.map(r => r.requestedUrl))];
           for (const url of urls) {
             const rows = reports.filter(r => r.requestedUrl === url);
@@ -128,20 +129,23 @@ jobs:
             const best = median(rows.map(r => r.categories['best-practices']?.score));
             const seo = median(rows.map(r => r.categories.seo?.score));
             console.log(`Lighthouse median | ${url} | performance=${performance ?? 'unverified'} accessibility=${accessibility ?? 'unverified'} best-practices=${best ?? 'unverified'} seo=${seo ?? 'unverified'}`);
-            const auditValues = new Map();
-            for (const report of rows) {
-              for (const [id, audit] of Object.entries(report.audits || {})) {
-                if (typeof audit.score === 'number') {
-                  if (!auditValues.has(id)) auditValues.set(id, []);
-                  auditValues.get(id).push(audit.score);
-                }
+            console.log(`Core metrics | ${url} | LCP_ms=${metric(rows,'largest-contentful-paint') ?? 'unverified'} TBT_ms=${metric(rows,'total-blocking-time') ?? 'unverified'} CLS=${metric(rows,'cumulative-layout-shift') ?? 'unverified'} FCP_ms=${metric(rows,'first-contentful-paint') ?? 'unverified'} SpeedIndex_ms=${metric(rows,'speed-index') ?? 'unverified'} TotalByteWeight_bytes=${metric(rows,'total-byte-weight') ?? 'unverified'} DOM_size=${metric(rows,'dom-size') ?? 'unverified'}`);
+            const candidates = [];
+            const auditIds = new Set(rows.flatMap(r => Object.keys(r.audits || {})));
+            for (const id of auditIds) {
+              const audits = rows.map(r => r.audits?.[id]).filter(Boolean);
+              const scores = audits.map(a => a.score).filter(v => typeof v === 'number');
+              const score = median(scores);
+              const savings = median(audits.map(a => a.details?.overallSavingsMs).filter(Number.isFinite));
+              if ((score !== null && score < 0.9) || (savings !== null && savings > 0)) {
+                const title = audits.find(a => a.title)?.title || id;
+                candidates.push({id,title,score,savings});
               }
             }
-            const failing = [];
-            for (const [id, scores] of auditValues) {
-              const score = median(scores);
-              if (score !== null && score < 0.9) failing.push(`${id}=${score}`);
+            candidates.sort((a,b)=>(b.savings ?? 0)-(a.savings ?? 0));
+            console.log(`Top Lighthouse opportunities | ${url}`);
+            for (const item of candidates.slice(0,12)) {
+              console.log(`  ${item.id} | ${item.title} | score=${item.score ?? 'unverified'} | savings_ms=${item.savings ?? 'unverified'}`);
             }
-            console.log(`Performance-related audit candidates below 0.90 | ${url} | ${failing.join(', ') || 'none'}`);
           }
           NODE
