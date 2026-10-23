@@ -23,11 +23,17 @@
     }));
   }
 
-  // Project cards are server-rendered and must not start hidden. Removing the
-  // reveal class avoids a first-paint opacity/transform transition that can
-  // be measured as layout instability by Lighthouse.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const reveals = document.querySelectorAll('.reveal');
-  reveals.forEach(x => x.classList.remove('reveal'));
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        io.unobserve(entry.target);
+      }
+    }), { rootMargin: '0px 0px -8% 0px' });
+    reveals.forEach(x => io.observe(x));
+  } else reveals.forEach(x => x.classList.add('is-visible'));
 
   const search = document.querySelector('#project-search');
   const cat = document.querySelector('#category-filter');
