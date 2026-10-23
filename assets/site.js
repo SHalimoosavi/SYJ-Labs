@@ -23,17 +23,11 @@
     }));
   }
 
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Keep server-rendered project cards visible on first paint. The previous
+  // IntersectionObserver reveal changed the visual position of the first
+  // flagship card during Lighthouse capture and produced a large CLS.
   const reveals = document.querySelectorAll('.reveal');
-  if (!reduce && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver(entries => entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        io.unobserve(entry.target);
-      }
-    }), { rootMargin: '0px 0px -8% 0px' });
-    reveals.forEach(x => io.observe(x));
-  } else reveals.forEach(x => x.classList.add('is-visible'));
+  reveals.forEach(x => x.classList.add('is-visible'));
 
   const search = document.querySelector('#project-search');
   const cat = document.querySelector('#category-filter');
