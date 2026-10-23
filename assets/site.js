@@ -23,11 +23,11 @@
     }));
   }
 
-  // Keep server-rendered project cards visible on first paint. The previous
-  // IntersectionObserver reveal changed the visual position of the first
-  // flagship card during Lighthouse capture and produced a large CLS.
+  // Project cards are server-rendered and must not start hidden. Removing the
+  // reveal class avoids a first-paint opacity/transform transition that can
+  // be measured as layout instability by Lighthouse.
   const reveals = document.querySelectorAll('.reveal');
-  reveals.forEach(x => x.classList.add('is-visible'));
+  reveals.forEach(x => x.classList.remove('reveal'));
 
   const search = document.querySelector('#project-search');
   const cat = document.querySelector('#category-filter');
