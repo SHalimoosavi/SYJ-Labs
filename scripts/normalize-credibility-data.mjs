@@ -6,6 +6,7 @@ const projectsPath = 'data/projects.json';
 const classificationPath = 'data/credibility-classification.json';
 const distProjectsPath = 'dist/data/projects.json';
 const distManifestPath = 'dist/data/public-manifest.json';
+const buildLicensePath = '.build/license-api.json';
 
 const curation = JSON.parse(await fs.readFile(curationPath, 'utf8'));
 const projects = JSON.parse(await fs.readFile(projectsPath, 'utf8'));
@@ -39,6 +40,7 @@ for (const [name, description] of Object.entries(descriptionOverrides)) {
 }
 
 const normalizedByName = new Map();
+const licenseApiByName = {};
 
 for (const project of projects.projects || []) {
   const entry = curation.repositories?.[project.name] || {};
@@ -54,10 +56,11 @@ for (const project of projects.projects || []) {
     project.topics = project.topics.filter(topic => !/termux|mobile-first/i.test(String(topic)));
   }
 
-  project.licenseApi = apiLicense;
+  delete project.licenseApi;
   project.licenseDisplay = displayLicense;
   project.license = displayLicense;
   normalizedByName.set(project.name, project);
+  licenseApiByName[project.name] = apiLicense;
 
   curation.repositories ||= {};
   curation.repositories[project.name] ||= {};
@@ -84,7 +87,12 @@ for (const [name, entry] of Object.entries(curation.repositories || {})) {
           : 'active';
   }
   if (entry.tier === 'archive') entry.status = 'archive';
+  if (entry.include === false) continue;
+  if (!(name in licenseApiByName)) licenseApiByName[name] = apiLicense;
 }
+
+await fs.mkdir('.build', { recursive: true });
+await fs.writeFile(buildLicensePath, JSON.stringify(licenseApiByName, null, 2) + '\n');
 
 await fs.writeFile(curationPath, JSON.stringify(curation, null, 2) + '\n');
 await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2) + '\n');
@@ -96,24 +104,26 @@ try {
     for (const project of dist.projects) {
       const normalized = normalizedByName.get(project.name);
       if (!normalized) continue;
-      project.licenseApi = normalized.licenseApi;
+      delete project.licenseApi;
       project.licenseDisplay = normalized.licenseDisplay;
       project.license = normalized.licenseDisplay;
-      if (Array.isArray(normalized.topics)) project.topics = normalized.topics;
     }
     await fs.writeFile(distProjectsPath, JSON.stringify(dist, null, 2) + '\n');
   }
+} catch {}
 
+try {
   const manifest = JSON.parse(await fs.readFile(distManifestPath, 'utf8'));
   if (Array.isArray(manifest.projects)) {
     for (const project of manifest.projects) {
       const normalized = normalizedByName.get(project.name);
       if (!normalized) continue;
-      project.licenseApi = normalized.licenseApi;
+      delete project.licenseApi;
       project.licenseDisplay = normalized.licenseDisplay;
+      project.license = normalized.licenseDisplay;
     }
     await fs.writeFile(distManifestPath, JSON.stringify(manifest, null, 2) + '\n');
   }
 } catch {}
 
-console.log('Credibility data normalized: every manifest project has explicit licenseApi and licenseDisplay, public license text is display-safe, prohibited project metadata is filtered, generated tiers are preserved, and hidden projects are removed from generated data.');
+console.log(`Credibility normalization complete: ${projects.projects.length} included projects; build-only license manifest written to ${buildLicensePath}.`);
