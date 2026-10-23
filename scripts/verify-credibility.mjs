@@ -4,6 +4,7 @@ import { licenseDisplay } from './license-mapping.mjs';
 
 const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
+const BUILD_LICENSE = path.join(ROOT, '.build/license-api.json');
 const OWNER = 'SHalimoosavi';
 const API = 'https://api.github.com';
 const curation = JSON.parse(await fs.readFile(path.join(ROOT, 'data/curation.json'), 'utf8'));
@@ -11,6 +12,7 @@ const manifest = JSON.parse(await fs.readFile(path.join(ROOT, 'data/public-manif
 const projectManifest = JSON.parse(await fs.readFile(path.join(ROOT, 'data/projects.json'), 'utf8'));
 const projects = curation.repositories || {};
 const projectByName = new Map((projectManifest.projects || []).map(project => [project.name, project]));
+const buildLicenses = JSON.parse(await fs.readFile(BUILD_LICENSE, 'utf8'));
 const included = Object.entries(projects).filter(([, p]) => p.include);
 const main = included.filter(([, p]) => p.tier !== 'archive');
 const archive = included.filter(([, p]) => p.tier === 'archive');
@@ -93,14 +95,15 @@ for (const file of htmlFiles) {
 for (const [name, p] of included) {
   const manifestProject = projectByName.get(name);
   if (!manifestProject) throw new Error(`Included repo missing from project manifest: ${name}`);
-  if (!Object.prototype.hasOwnProperty.call(manifestProject, 'licenseApi')) throw new Error(`License API field missing for ${name}.`);
   if (!Object.prototype.hasOwnProperty.call(manifestProject, 'licenseDisplay')) throw new Error(`License display field missing for ${name}.`);
+  if (Object.prototype.hasOwnProperty.call(manifestProject, 'licenseApi')) throw new Error(`Raw licenseApi must not be published for ${name}.`);
 
   const apiLicense = await githubLicense(name);
-  const manifestApi = manifestProject.licenseApi ?? null;
-  if ((manifestApi || null) !== (apiLicense || null)) throw new Error(`License API mismatch for ${name}: manifest=${manifestApi || 'null'} github=${apiLicense || 'null'}.`);
+  const buildLicense = buildLicenses[name] ?? null;
+  if ((buildLicense || null) !== (apiLicense || null)) throw new Error(`License API mismatch for ${name}: build=${buildLicense || 'null'} github=${apiLicense || 'null'}.`);
   const expectedPageLicense = licenseDisplay(apiLicense);
   if (manifestProject.licenseDisplay !== expectedPageLicense) throw new Error(`License display mismatch for ${name}: manifest=${manifestProject.licenseDisplay || 'missing'} expected=${expectedPageLicense}.`);
+  if (manifestProject.license !== expectedPageLicense) throw new Error(`License metadata mismatch for ${name}: license=${manifestProject.license || 'missing'} expected=${expectedPageLicense}.`);
 
   const slug = manifestProject.slug || p.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const file = path.join(DIST, 'projects', slug, 'index.html');
@@ -112,9 +115,7 @@ for (const [name, p] of included) {
 const generatedText = allText.map(([, text]) => text).join('\n');
 for (const [name, p] of Object.entries(projects)) {
   if (p.include || name === 'SYJ-Labs') continue;
-  if (generatedText.includes(`/projects/${p.slug}/`) || generatedText.includes(`>${name}<`) || generatedText.includes(`| ${name} |`)) {
-    throw new Error(`include:false project leaked into generated output: ${name}`);
-  }
+  if (generatedText.includes(`/projects/${p.slug}/`) || generatedText.includes(`>${name}<`) || generatedText.includes(`| ${name} |`)) throw new Error(`include:false project leaked into generated output: ${name}`);
 }
 
 for (const [name, p] of flagships) {
@@ -148,9 +149,6 @@ if (manifest.total !== included.length || manifest.main !== main.length || manif
 if (catalogueTotal !== included.length) throw new Error(`Catalogue count ${catalogueTotal} does not match manifest ${included.length}.`);
 if (!llms.includes(`Catalogue: ${included.length} public projects`)) throw new Error(`llms.txt count does not match manifest ${included.length}.`);
 if (sitemapCount !== expectedSitemap) throw new Error(`Sitemap count ${sitemapCount} does not equal expected ${expectedSitemap}.`);
-for (const [, p] of archive) {
-  const slug = p.slug || '';
-  if (sitemap.includes(`/projects/${slug}/`)) throw new Error(`Archive project leaked into sitemap: ${p.name}`);
-}
+for (const [, p] of archive) { const slug = p.slug || ''; if (sitemap.includes(`/projects/${slug}/`)) throw new Error(`Archive project leaked into sitemap: ${p.name}`); }
 
 console.log(`credibility verification passed | public=${included.length} main=${main.length} archive=${archive.length} flagship=${flagships.length} licenses=${included.length}`);
