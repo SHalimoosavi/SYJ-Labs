@@ -86,7 +86,7 @@ function optimizeCatalogue(html) {
 }
 
 function injectAccessibilityStyles(html) {
-  const style = `<style id="syj-a11y-overrides">.hero-bottom{color:#72948c}.focus-grid b{color:#72948c}.catalogue-section-heading{max-width:1180px;margin:0 auto 18px;padding:0 24px;font-size:28px;line-height:1.1}.site-header{backdrop-filter:none!important}.hero-glow{filter:none!important;animation:none!important}.reveal{animation:none!important}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d7ff63;outline-offset:3px}</style>`;
+  const style = `<style id="syj-a11y-overrides">.hero-bottom{color:#72948c}.focus-grid b{color:#72948c}.catalogue-section-heading{max-width:1180px;margin:0 auto 18px;padding:0 24px;font-size:28px;line-height:1.1}.site-header{backdrop-filter:none!important}.hero-glow{filter:none!important;animation:none!important}.reveal{animation:none!important}.section,.project-hero{content-visibility:auto;contain-intrinsic-size:700px}a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d7ff63;outline-offset:3px}</style>`;
   return html.includes('id="syj-a11y-overrides"') ? html : html.replace('</head>', `${style}</head>`);
 }
 
