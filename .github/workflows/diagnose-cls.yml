@@ -37,125 +37,96 @@ jobs:
           CHROME_PATH="$(node -e "const c=require('chrome-launcher'); process.stdout.write(c.Launcher.getFirstInstallation())")"
           test -x "$CHROME_PATH"
           echo "CHROME_PATH=$CHROME_PATH" >> "$GITHUB_ENV"
-          echo "Using Chrome: $CHROME_PATH"
       - name: Record desktop layout shifts
         run: |
           node <<'NODE'
-          const fs = require('node:fs');
-          const puppeteer = require('puppeteer-core');
-
-          const url = 'http://127.0.0.1:4173/index.html';
-          const output = '/tmp/cls-diagnostic.json';
-          const events = [];
-
-          const browser = await puppeteer.launch({
-            executablePath: process.env.CHROME_PATH,
-            headless: 'new',
-            defaultViewport: { width: 1350, height: 940, deviceScaleFactor: 1 },
-            args: ['--no-sandbox', '--disable-dev-shm-usage']
-          });
-
-          const page = await browser.newPage();
-          await page.evaluateOnNewDocument(() => {
-            window.__syjCls = { shifts: [], mutations: [], classChanges: [], resourceSnapshot: [] };
-            const originalObserve = PerformanceObserver;
-            window.__syjObserversInstalled = true;
-            new originalObserve(list => {
-              for (const entry of list.getEntries()) {
-                if (entry.entryType !== 'layout-shift' || entry.hadRecentInput) continue;
-                const sources = (entry.sources || []).map(source => {
-                  const n = source.node;
-                  return {
-                    node: n ? { tag: n.tagName, id: n.id, class: n.className, text: (n.textContent || '').trim().slice(0, 120) } : null,
-                    previousRect: source.previousRect ? { x: source.previousRect.x, y: source.previousRect.y, width: source.previousRect.width, height: source.previousRect.height } : null,
-                    currentRect: source.currentRect ? { x: source.currentRect.x, y: source.currentRect.y, width: source.currentRect.width, height: source.currentRect.height } : null
-                  };
-                });
-                window.__syjCls.shifts.push({ value: entry.value, startTime: entry.startTime, sources });
-              }
-            }).observe({ type: 'layout-shift', buffered: true });
-
-            const resourceObserver = new PerformanceObserver(list => {
-              for (const entry of list.getEntries()) {
-                if (['resource'].includes(entry.entryType)) {
-                  window.__syjCls.resourceSnapshot.push({ name: entry.name, initiatorType: entry.initiatorType, responseEnd: entry.responseEnd, startTime: entry.startTime });
-                }
-              }
+          (async () => {
+            const fs = require('node:fs');
+            const puppeteer = require('puppeteer-core');
+            const browser = await puppeteer.launch({
+              executablePath: process.env.CHROME_PATH,
+              headless: 'new',
+              defaultViewport: { width: 1350, height: 940, deviceScaleFactor: 1 },
+              args: ['--no-sandbox', '--disable-dev-shm-usage']
             });
-            resourceObserver.observe({ type: 'resource', buffered: true });
-
-            const originalAppend = Node.prototype.appendChild;
-            const originalInsertBefore = Node.prototype.insertBefore;
-            const originalReplace = Element.prototype.replaceChildren;
-            const recordMutation = (kind, target, node) => {
-              window.__syjCls.mutations.push({ kind, time: performance.now(), target: target && target.outerHTML ? target.outerHTML.slice(0, 220) : String(target), node: node && node.outerHTML ? node.outerHTML.slice(0, 220) : String(node) });
-            };
-            Node.prototype.appendChild = function(node) { recordMutation('appendChild', this, node); return originalAppend.call(this, node); };
-            Node.prototype.insertBefore = function(node, ref) { recordMutation('insertBefore', this, node); return originalInsertBefore.call(this, node, ref); };
-            Element.prototype.replaceChildren = function(...nodes) { recordMutation('replaceChildren', this, nodes.join('')); return originalReplace.call(this, ...nodes); };
-
-            const classProto = DOMTokenList.prototype;
-            for (const method of ['add', 'remove', 'toggle']) {
-              const original = classProto[method];
-              classProto[method] = function(...tokens) {
-                window.__syjCls.classChanges.push({ method, time: performance.now(), element: this.ownerElement ? { tag: this.ownerElement.tagName, id: this.ownerElement.id, class: this.ownerElement.className } : null, tokens });
-                return original.apply(this, tokens);
+            const page = await browser.newPage();
+            await page.evaluateOnNewDocument(() => {
+              window.__syjDiag = { shifts: [], mutations: [], classes: [], decodes: [], resources: [] };
+              const record = (bucket, value) => window.__syjDiag[bucket].push(value);
+              new PerformanceObserver(list => {
+                for (const e of list.getEntries()) {
+                  if (e.entryType !== 'layout-shift' || e.hadRecentInput) continue;
+                  record('shifts', {
+                    value: e.value,
+                    startTime: e.startTime,
+                    sources: (e.sources || []).map(s => ({
+                      node: s.node ? { tag: s.node.tagName, id: s.node.id, class: s.node.className, text: (s.node.textContent || '').trim().slice(0, 100) } : null,
+                      previousRect: s.previousRect,
+                      currentRect: s.currentRect
+                    }))
+                  });
+                }
+              }).observe({ type: 'layout-shift', buffered: true });
+              const mutation = (kind, target, node) => {
+                const stack = new Error().stack || '';
+                record('mutations', {
+                  time: performance.now(), kind,
+                  target: target?.outerHTML?.slice(0, 180) || String(target),
+                  node: node?.outerHTML?.slice(0, 180) || String(node),
+                  stack: stack.split('\n').slice(2, 6).join(' | ')
+                });
               };
+              const append = Node.prototype.appendChild;
+              const insert = Node.prototype.insertBefore;
+              const replace = Element.prototype.replaceChildren;
+              Node.prototype.appendChild = function(n) { mutation('appendChild', this, n); return append.call(this, n); };
+              Node.prototype.insertBefore = function(n, r) { mutation('insertBefore', this, n); return insert.call(this, n, r); };
+              Element.prototype.replaceChildren = function(...n) { mutation('replaceChildren', this, n.join('')); return replace.call(this, ...n); };
+              for (const method of ['add', 'remove', 'toggle']) {
+                const original = DOMTokenList.prototype[method];
+                DOMTokenList.prototype[method] = function(...tokens) {
+                  record('classes', { time: performance.now(), method, tokens, element: this.ownerElement ? { tag: this.ownerElement.tagName, id: this.ownerElement.id, class: this.ownerElement.className } : null, stack: (new Error().stack || '').split('\n').slice(2, 6).join(' | ') });
+                  return original.apply(this, tokens);
+                };
+              }
+              new MutationObserver(list => {
+                for (const m of list) record('mutations', { time: performance.now(), kind: 'MutationObserver', target: m.target?.outerHTML?.slice(0, 180) || String(m.target), node: [...m.addedNodes].map(n => n.outerHTML || n.textContent).join('').slice(0, 180) });
+              }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+              window.addEventListener('load', () => {
+                for (const img of document.images) img.decode?.().then(() => record('decodes', { time: performance.now(), type: 'image', src: img.currentSrc || img.src })).catch(() => {});
+                document.fonts?.ready.then(() => record('decodes', { time: performance.now(), type: 'fonts-ready' })).catch(() => {});
+              });
+            });
+            await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'networkidle2' });
+            await new Promise(r => setTimeout(r, 1800));
+            const result = await page.evaluate(() => ({
+              shifts: window.__syjDiag.shifts,
+              mutations: window.__syjDiag.mutations,
+              classes: window.__syjDiag.classes,
+              decodes: window.__syjDiag.decodes,
+              resources: performance.getEntriesByType('resource').map(e => ({ name: e.name, initiatorType: e.initiatorType, startTime: e.startTime, responseEnd: e.responseEnd, duration: e.duration }))
+            }));
+            fs.writeFileSync('/tmp/cls-diagnostic.json', JSON.stringify(result, null, 2));
+            const relevant = result.resources.filter(r => /font|woff|ttf|otf|css|js|webp|png|jpe?g|svg/i.test(r.name));
+            const preceding = shiftTime => [...result.mutations.map(x => ({ time:x.time, type:x.kind, detail:x.node })), ...result.classes.map(x => ({ time:x.time, type:'class-'+x.method, detail:x.tokens.join(',') })), ...result.decodes.map(x => ({ time:x.time, type:x.type, detail:x.src || '' })), ...relevant.map(x => ({ time:x.responseEnd, type:x.initiatorType, detail:x.name }))].filter(x => x.time <= shiftTime).sort((a,b) => b.time-a.time)[0];
+            console.log('\nLAYOUT-SHIFT TABLE');
+            console.log('value\tstartTime_ms\tnode\tpreviousRect\tcurrentRect\tpreceding_event');
+            for (const s of result.shifts) for (const src of s.sources.length ? s.sources : [{node:null,previousRect:null,currentRect:null}]) {
+              const n = src.node ? `${src.node.tag}${src.node.id ? '#'+src.node.id : ''}${src.node.class ? '.'+String(src.node.class).replace(/\s+/g,'.') : ''}` : 'unknown';
+              const p = preceding(s.startTime);
+              console.log(`${s.value}\t${s.startTime}\t${n}\t${JSON.stringify(src.previousRect)}\t${JSON.stringify(src.currentRect)}\t${p ? `${p.type}: ${p.detail} @ ${p.time}ms` : 'none captured'}`);
             }
-          });
-
-          await page.goto(url, { waitUntil: 'networkidle2' });
-          await new Promise(resolve => setTimeout(resolve, 1500));
-
-          const result = await page.evaluate(() => ({
-            shifts: window.__syjCls.shifts,
-            mutations: window.__syjCls.mutations,
-            classChanges: window.__syjCls.classChanges,
-            resources: performance.getEntriesByType('resource').map(entry => ({
-              name: entry.name,
-              initiatorType: entry.initiatorType,
-              startTime: entry.startTime,
-              responseEnd: entry.responseEnd,
-              duration: entry.duration
-            }))
-          }));
-
-          fs.writeFileSync(output, JSON.stringify(result, null, 2));
-
-          const interestingResources = result.resources.filter(r => /font|\.woff|\.woff2|\.ttf|\.otf|\.css(?:$|\?)|\.js(?:$|\?)|\.webp|\.png|\.jpe?g|\.svg(?:$|\?)/i.test(r.name));
-          const mutations = result.mutations;
-          const classes = result.classChanges;
-
-          console.log('\nLAYOUT-SHIFT TABLE');
-          console.log('value\tstartTime_ms\tnode\tpreviousRect\tcurrentRect\tpreceding_event');
-          for (const shift of result.shifts) {
-            for (const source of shift.sources.length ? shift.sources : [{ node: null, previousRect: null, currentRect: null }]) {
-              const nodeText = source.node ? `${source.node.tag}${source.node.id ? '#' + source.node.id : ''}${source.node.class ? '.' + String(source.node.class).replace(/\s+/g, '.') : ''}` : 'unknown';
-              const priorMutations = mutations.filter(m => m.time <= shift.startTime);
-              const priorClasses = classes.filter(c => c.time <= shift.startTime);
-              const priorResources = interestingResources.filter(r => r.responseEnd <= shift.startTime);
-              const event = [
-                ...priorMutations.map(m => ({ time: m.time, label: `${m.kind} ${m.target}` })),
-                ...priorClasses.map(c => ({ time: c.time, label: `class.${c.method} ${JSON.stringify(c.tokens)}` })),
-                ...priorResources.map(r => ({ time: r.responseEnd, label: `${r.initiatorType} ${r.name}` }))
-              ].sort((a,b) => b.time - a.time)[0];
-              console.log(`${shift.value}\t${shift.startTime}\t${nodeText}\t${JSON.stringify(source.previousRect)}\t${JSON.stringify(source.currentRect)}\t${event ? `${event.label} @ ${event.time}ms` : 'none captured'}`);
-            }
-          }
-
-          console.log('\nRESOURCE TIMINGS (fonts/images/CSS/JS)');
-          for (const r of interestingResources) console.log(`${r.responseEnd}ms\t${r.initiatorType}\t${r.name}`);
-
-          console.log('\nDOM MUTATIONS');
-          for (const m of mutations) console.log(`${m.time}ms\t${m.kind}\t${m.target}\t${m.node}`);
-
-          console.log('\nCLASS CHANGES');
-          for (const c of classes) console.log(`${c.time}ms\t${c.method}\t${c.element ? JSON.stringify(c.element) : 'unknown'}\t${c.tokens.join(',')}`);
-
-          await browser.close();
+            console.log('\nRESOURCE TIMINGS');
+            for (const r of relevant) console.log(`${r.responseEnd}ms\t${r.initiatorType}\t${r.name}`);
+            console.log('\nDOM MUTATIONS / CLASS CHANGES / DECODE EVENTS');
+            for (const x of [...result.mutations.map(x => ({...x,type:x.kind})), ...result.classes.map(x => ({...x,type:'class-'+x.method})), ...result.decodes.map(x => ({...x,type:'decode'}))].sort((a,b)=>a.time-b.time)) console.log(`${x.time}ms\t${x.type}\t${x.node || x.detail || x.src || ''}`);
+            await browser.close();
+          })().catch(error => { console.error(error); process.exit(1); });
           NODE
       - name: Upload diagnostic evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: desktop-cls-diagnostic
           path: /tmp/cls-diagnostic.json
+          if-no-files-found: ignore
