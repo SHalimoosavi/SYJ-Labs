@@ -18,10 +18,6 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v5
-      - name: Install ImageMagick
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick
       - uses: actions/setup-node@v5
         with:
           node-version: 22
@@ -43,85 +39,42 @@ jobs:
           (async () => {
             const fs = require('node:fs');
             const puppeteer = require('puppeteer-core');
-            const browser = await puppeteer.launch({
-              executablePath: process.env.CHROME_PATH,
-              headless: 'new',
-              defaultViewport: { width: 1350, height: 940, deviceScaleFactor: 1 },
-              args: ['--no-sandbox', '--disable-dev-shm-usage']
-            });
+            const rect = r => r ? { x:r.x, y:r.y, width:r.width, height:r.height, top:r.top, right:r.right, bottom:r.bottom, left:r.left } : null;
+            const browser = await puppeteer.launch({ executablePath: process.env.CHROME_PATH, headless: 'new', defaultViewport: { width: 1350, height: 940, deviceScaleFactor: 1 }, args: ['--no-sandbox', '--disable-dev-shm-usage'] });
             const page = await browser.newPage();
             await page.evaluateOnNewDocument(() => {
-              window.__syjDiag = { shifts: [], mutations: [], classes: [], decodes: [], resources: [] };
+              window.__syjDiag = { shifts: [], mutations: [], classes: [], decodes: [] };
               const record = (bucket, value) => window.__syjDiag[bucket].push(value);
               new PerformanceObserver(list => {
                 for (const e of list.getEntries()) {
                   if (e.entryType !== 'layout-shift' || e.hadRecentInput) continue;
-                  record('shifts', {
-                    value: e.value,
-                    startTime: e.startTime,
-                    sources: (e.sources || []).map(s => ({
-                      node: s.node ? { tag: s.node.tagName, id: s.node.id, class: s.node.className, text: (s.node.textContent || '').trim().slice(0, 100) } : null,
-                      previousRect: s.previousRect,
-                      currentRect: s.currentRect
-                    }))
-                  });
+                  record('shifts', { value:e.value, startTime:e.startTime, sources:(e.sources || []).map(s => ({ node:s.node ? { tag:s.node.tagName, id:s.node.id, class:s.node.className, text:(s.node.textContent || '').trim().slice(0,100) } : null, previousRect:{x:s.previousRect.x,y:s.previousRect.y,width:s.previousRect.width,height:s.previousRect.height,top:s.previousRect.top,right:s.previousRect.right,bottom:s.previousRect.bottom,left:s.previousRect.left}, currentRect:{x:s.currentRect.x,y:s.currentRect.y,width:s.currentRect.width,height:s.currentRect.height,top:s.currentRect.top,right:s.currentRect.right,bottom:s.currentRect.bottom,left:s.currentRect.left} })) });
                 }
-              }).observe({ type: 'layout-shift', buffered: true });
-              const mutation = (kind, target, node) => {
-                const stack = new Error().stack || '';
-                record('mutations', {
-                  time: performance.now(), kind,
-                  target: target?.outerHTML?.slice(0, 180) || String(target),
-                  node: node?.outerHTML?.slice(0, 180) || String(node),
-                  stack: stack.split('\n').slice(2, 6).join(' | ')
-                });
-              };
-              const append = Node.prototype.appendChild;
-              const insert = Node.prototype.insertBefore;
-              const replace = Element.prototype.replaceChildren;
-              Node.prototype.appendChild = function(n) { mutation('appendChild', this, n); return append.call(this, n); };
-              Node.prototype.insertBefore = function(n, r) { mutation('insertBefore', this, n); return insert.call(this, n, r); };
-              Element.prototype.replaceChildren = function(...n) { mutation('replaceChildren', this, n.join('')); return replace.call(this, ...n); };
-              for (const method of ['add', 'remove', 'toggle']) {
-                const original = DOMTokenList.prototype[method];
-                DOMTokenList.prototype[method] = function(...tokens) {
-                  record('classes', { time: performance.now(), method, tokens, element: this.ownerElement ? { tag: this.ownerElement.tagName, id: this.ownerElement.id, class: this.ownerElement.className } : null, stack: (new Error().stack || '').split('\n').slice(2, 6).join(' | ') });
-                  return original.apply(this, tokens);
-                };
-              }
-              new MutationObserver(list => {
-                for (const m of list) record('mutations', { time: performance.now(), kind: 'MutationObserver', target: m.target?.outerHTML?.slice(0, 180) || String(m.target), node: [...m.addedNodes].map(n => n.outerHTML || n.textContent).join('').slice(0, 180) });
-              }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
-              window.addEventListener('load', () => {
-                for (const img of document.images) img.decode?.().then(() => record('decodes', { time: performance.now(), type: 'image', src: img.currentSrc || img.src })).catch(() => {});
-                document.fonts?.ready.then(() => record('decodes', { time: performance.now(), type: 'fonts-ready' })).catch(() => {});
-              });
+              }).observe({ type:'layout-shift', buffered:true });
+              const mutation = (kind, target, node) => record('mutations', { time:performance.now(), kind, target:target?.outerHTML?.slice(0,180) || String(target), node:node?.outerHTML?.slice(0,180) || String(node), stack:(new Error().stack || '').split('\n').slice(2,6).join(' | ') });
+              const append = Node.prototype.appendChild, insert = Node.prototype.insertBefore, replace = Element.prototype.replaceChildren;
+              Node.prototype.appendChild = function(n) { mutation('appendChild',this,n); return append.call(this,n); };
+              Node.prototype.insertBefore = function(n,r) { mutation('insertBefore',this,n); return insert.call(this,n,r); };
+              Element.prototype.replaceChildren = function(...n) { mutation('replaceChildren',this,n.join('')); return replace.call(this,...n); };
+              for (const method of ['add','remove','toggle']) { const original = DOMTokenList.prototype[method]; DOMTokenList.prototype[method] = function(...tokens) { record('classes',{time:performance.now(),method,tokens,element:this.ownerElement ? {tag:this.ownerElement.tagName,id:this.ownerElement.id,class:this.ownerElement.className} : null,stack:(new Error().stack || '').split('\n').slice(2,6).join(' | ')}); return original.apply(this,tokens); }; }
+              new MutationObserver(list => { for (const m of list) record('mutations',{time:performance.now(),kind:'MutationObserver',target:m.target?.outerHTML?.slice(0,180) || String(m.target),node:[...m.addedNodes].map(n=>n.outerHTML || n.textContent).join('').slice(0,180)}); }).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','hidden']});
+              addEventListener('load',() => { for (const img of document.images) { img.addEventListener('load',() => record('decodes',{time:performance.now(),type:'image-load',src:img.currentSrc || img.src}),{once:true}); img.decode?.().then(() => record('decodes',{time:performance.now(),type:'image-decode',src:img.currentSrc || img.src})).catch(() => {}); } document.fonts?.ready.then(() => record('decodes',{time:performance.now(),type:'fonts-ready'})).catch(() => {}); });
             });
-            await page.goto('http://127.0.0.1:4173/index.html', { waitUntil: 'networkidle2' });
-            await new Promise(r => setTimeout(r, 1800));
-            const result = await page.evaluate(() => ({
-              shifts: window.__syjDiag.shifts,
-              mutations: window.__syjDiag.mutations,
-              classes: window.__syjDiag.classes,
-              decodes: window.__syjDiag.decodes,
-              resources: performance.getEntriesByType('resource').map(e => ({ name: e.name, initiatorType: e.initiatorType, startTime: e.startTime, responseEnd: e.responseEnd, duration: e.duration }))
-            }));
-            fs.writeFileSync('/tmp/cls-diagnostic.json', JSON.stringify(result, null, 2));
-            const relevant = result.resources.filter(r => /font|woff|ttf|otf|css|js|webp|png|jpe?g|svg/i.test(r.name));
-            const preceding = shiftTime => [...result.mutations.map(x => ({ time:x.time, type:x.kind, detail:x.node })), ...result.classes.map(x => ({ time:x.time, type:'class-'+x.method, detail:x.tokens.join(',') })), ...result.decodes.map(x => ({ time:x.time, type:x.type, detail:x.src || '' })), ...relevant.map(x => ({ time:x.responseEnd, type:x.initiatorType, detail:x.name }))].filter(x => x.time <= shiftTime).sort((a,b) => b.time-a.time)[0];
+            await page.goto('http://127.0.0.1:4173/index.html',{waitUntil:'networkidle2'});
+            await new Promise(r=>setTimeout(r,1800));
+            const result = await page.evaluate(() => ({ shifts:window.__syjDiag.shifts, mutations:window.__syjDiag.mutations, classes:window.__syjDiag.classes, decodes:window.__syjDiag.decodes, resources:performance.getEntriesByType('resource').map(e=>({name:e.name,initiatorType:e.initiatorType,startTime:e.startTime,responseEnd:e.responseEnd,duration:e.duration})) }));
+            fs.writeFileSync('/tmp/cls-diagnostic.json',JSON.stringify(result,null,2));
+            const relevant = result.resources.filter(r=>/font|woff|ttf|otf|css|js|webp|png|jpe?g|svg/i.test(r.name));
+            const preceding = t => [...result.mutations.map(x=>({time:x.time,type:x.kind,detail:x.node})),...result.classes.map(x=>({time:x.time,type:'class-'+x.method,detail:x.tokens.join(',')})),...result.decodes.map(x=>({time:x.time,type:x.type,detail:x.src || ''})),...relevant.map(x=>({time:x.responseEnd,type:x.initiatorType,detail:x.name}))].filter(x=>x.time<=t).sort((a,b)=>b.time-a.time)[0];
             console.log('\nLAYOUT-SHIFT TABLE');
             console.log('value\tstartTime_ms\tnode\tpreviousRect\tcurrentRect\tpreceding_event');
-            for (const s of result.shifts) for (const src of s.sources.length ? s.sources : [{node:null,previousRect:null,currentRect:null}]) {
-              const n = src.node ? `${src.node.tag}${src.node.id ? '#'+src.node.id : ''}${src.node.class ? '.'+String(src.node.class).replace(/\s+/g,'.') : ''}` : 'unknown';
-              const p = preceding(s.startTime);
-              console.log(`${s.value}\t${s.startTime}\t${n}\t${JSON.stringify(src.previousRect)}\t${JSON.stringify(src.currentRect)}\t${p ? `${p.type}: ${p.detail} @ ${p.time}ms` : 'none captured'}`);
-            }
+            for (const s of result.shifts) for (const src of s.sources.length ? s.sources : [{node:null,previousRect:null,currentRect:null}]) { const n=src.node ? `${src.node.tag}${src.node.id ? '#'+src.node.id:''}${src.node.class ? '.'+String(src.node.class).replace(/\s+/g,'.'):''}`:'unknown'; const p=preceding(s.startTime); console.log(`${s.value}\t${s.startTime}\t${n}\t${JSON.stringify(src.previousRect)}\t${JSON.stringify(src.currentRect)}\t${p ? `${p.type}: ${p.detail} @ ${p.time}ms`:'none captured'}`); }
             console.log('\nRESOURCE TIMINGS');
             for (const r of relevant) console.log(`${r.responseEnd}ms\t${r.initiatorType}\t${r.name}`);
             console.log('\nDOM MUTATIONS / CLASS CHANGES / DECODE EVENTS');
-            for (const x of [...result.mutations.map(x => ({...x,type:x.kind})), ...result.classes.map(x => ({...x,type:'class-'+x.method})), ...result.decodes.map(x => ({...x,type:'decode'}))].sort((a,b)=>a.time-b.time)) console.log(`${x.time}ms\t${x.type}\t${x.node || x.detail || x.src || ''}`);
+            for (const x of [...result.mutations.map(x=>({...x,type:x.kind})),...result.classes.map(x=>({...x,type:'class-'+x.method})),...result.decodes.map(x=>({...x,type:'decode'}))].sort((a,b)=>a.time-b.time)) console.log(`${x.time}ms\t${x.type}\t${x.node || x.detail || x.src || ''}`);
             await browser.close();
-          })().catch(error => { console.error(error); process.exit(1); });
+          })().catch(error=>{console.error(error);process.exit(1);});
           NODE
       - name: Upload diagnostic evidence
         if: always()
