@@ -7,30 +7,16 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = path.join(ROOT, 'dist');
 const IMAGEMAGICK = process.env.IMAGEMAGICK || 'convert';
 
-const staleHomepageRepos = new Set([
-  'syj-one',
-  'syj-leadforge',
-  'ai-zara-web-widget',
-  'syj-github-optimiser'
-]);
-
-const staleHomepageUrls = new Set([
-  'https://shalimoosavi.github.io/syj-one/',
-  'https://shalimoosavi.github.io/SYJ-LeadForge/',
-  'https://shalimoosavi.github.io/AI-Zara-web-widget/',
-  'https://github.com/SHalimoosavi/syj-github-optimizer'
-]);
-
-const stripMarkdownLinks = value =>
-  String(value || '').replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '$1');
+const staleHomepageRepos = new Set(['syj-one','syj-leadforge','ai-zara-web-widget','syj-github-optimiser']);
+const staleHomepageUrls = new Set(['https://shalimoosavi.github.io/syj-one/','https://shalimoosavi.github.io/SYJ-LeadForge/','https://shalimoosavi.github.io/AI-Zara-web-widget/','https://github.com/SHalimoosavi/syj-github-optimizer']);
+const stripMarkdownLinks = value => String(value || '').replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '$1');
 
 async function walk(dir) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
   const files = [];
   for (const entry of entries) {
     const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) files.push(...await walk(full));
-    else files.push(full);
+    if (entry.isDirectory()) files.push(...await walk(full)); else files.push(full);
   }
   return files;
 }
@@ -68,20 +54,8 @@ function optimizeCatalogue(html) {
     if (cardIndex <= 12 || /\bhidden\b/.test(attrs)) return full;
     return `<article${attrs} hidden>`;
   });
-
-  if (!html.includes('id="catalogue-section-heading"')) {
-    html = html.replace(
-      /(<section\s+class=["']grid catalogue-grid["'][^>]*id=["']catalogue["'])/i,
-      '<h2 id="catalogue-section-heading" class="catalogue-section-heading">Projects</h2>$1'
-    );
-  }
-
-  if (cardIndex > 12 && !html.includes('id="load-more-projects"')) {
-    html = html.replace(
-      /(<section\s+class=["']grid catalogue-grid["'][^>]*id=["']catalogue["'][\s\S]*?<\/section>)/i,
-      '$1<div class="center"><button class="button outline" id="load-more-projects" type="button">Load more projects</button></div>'
-    );
-  }
+  if (!html.includes('id="catalogue-section-heading"')) html = html.replace(/(<section\s+class=["']grid catalogue-grid["'][^>]*id=["']catalogue["'])/i, '<h2 id="catalogue-section-heading" class="catalogue-section-heading">Projects</h2>$1');
+  if (cardIndex > 12 && !html.includes('id="load-more-projects"')) html = html.replace(/(<section\s+class=["']grid catalogue-grid["'][^>]*id=["']catalogue["'][\s\S]*?<\/section>)/i, '$1<div class="center"><button class="button outline" id="load-more-projects" type="button">Load more projects</button></div>');
   return html;
 }
 
@@ -106,44 +80,41 @@ async function optimizeImages() {
     const projectFiles = (await fs.readdir(projectDir)).filter(file => file.endsWith('.webp'));
     await Promise.all(projectFiles.map(file => optimizeImage(path.join(projectDir, file), '960x480>', 72)));
   } catch {}
-
   const founder = path.join(DIST, 'assets/founder-photo.webp');
   try { await optimizeImage(founder, '720x720>', 78); } catch {}
-
   try {
-    for (const file of await fs.readdir(projectDir)) {
-      if (file.endsWith('.png')) await fs.rm(path.join(projectDir, file), { force: true });
-    }
+    for (const file of await fs.readdir(projectDir)) if (file.endsWith('.png')) await fs.rm(path.join(projectDir, file), { force: true });
   } catch {}
 }
 
 async function cleanHtml(file) {
   let html;
   try { html = await fs.readFile(file, 'utf8'); } catch { return; }
-
   for (const url of staleHomepageUrls) {
     const escaped = url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     html = html.replace(new RegExp(`\\s*<a\\b[^>]*href=["']${escaped}["'][\\s\\S]*?<\\/a>`, 'gi'), '');
   }
-
   html = html.replace(/(assets\/projects\/[^"'?#]+)\.png/gi, '$1.webp');
   html = html.replace(/\s*<a\b[^>]*class=["'][^"']*button[^"']*["'][^>]*>\s*Live site\s*↗\s*<\/a>/gi, '');
   html = stripMarkdownLinks(html);
   html = injectAccessibilityStyles(html);
 
-  if (path.resolve(file) === path.resolve(path.join(DIST, 'projects/index.html'))) html = optimizeCatalogue(html);
+  if (path.resolve(file) === path.resolve(path.join(DIST, 'index.html'))) {
+    let visibleProjectImage = 0;
+    html = html.replace(/<img\b[^>]*src=["'][^"']*assets\/projects\/[^"']+["'][^>]*>/gi, tag => {
+      visibleProjectImage += 1;
+      return visibleProjectImage <= 2 ? tag.replace(/\sloading=["']lazy["']/i, ' loading="eager"') : tag;
+    });
+  }
 
+  if (path.resolve(file) === path.resolve(path.join(DIST, 'projects/index.html'))) html = optimizeCatalogue(html);
   html = html.replace(/<!--(?!\[if)[\s\S]*?-->/g, '').replace(/>\s+</g, '><').replace(/[ \t]{2,}/g, ' ');
   await fs.writeFile(file, html, 'utf8');
 }
 
 await cleanJson(path.join(ROOT, 'data/projects.json'));
 await cleanJson(path.join(DIST, 'data/projects.json'));
-
 const files = await walk(DIST);
-for (const file of files) {
-  if (/\.(html|txt)$/i.test(file)) await cleanHtml(file);
-}
+for (const file of files) if (/\.(html|txt)$/i.test(file)) await cleanHtml(file);
 await optimizeImages();
-
 console.log('Post-build cleanup complete: stale homepage CTAs removed, project previews optimized to WebP, markdown artifacts cleaned, catalogue loading optimized, HTML minified, and accessibility/performance fixes injected.');
