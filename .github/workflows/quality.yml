@@ -166,3 +166,40 @@ jobs:
             }
           }
           NODE
+
+  production-diagnostic:
+    name: Production Lighthouse diagnostic (non-gating)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Run production Lighthouse
+        run: npx lhci autorun --config=lighthouserc.production.${{ matrix.mode }}.json
+        strategy:
+          fail-fast: false
+          matrix:
+            mode: [mobile, desktop]
+      - name: Print failing production audits
+        if: always()
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const files = fs.existsSync('.lighthouseci') ? fs.readdirSync('.lighthouseci').filter(f => f.endsWith('.json')) : [];
+          for (const file of files) {
+            try {
+              const r = JSON.parse(fs.readFileSync(path.join('.lighthouseci', file), 'utf8'));
+              if (!r.categories) continue;
+              console.log(`PRODUCTION | ${r.requestedUrl}`);
+              console.log(`scores performance=${r.categories.performance?.score} accessibility=${r.categories.accessibility?.score} best-practices=${r.categories['best-practices']?.score} seo=${r.categories.seo?.score} CLS=${r.audits?.['cumulative-layout-shift']?.numericValue}`);
+              for (const [id,a] of Object.entries(r.audits || {})) {
+                if (typeof a.score === 'number' && a.score < 1) console.log(`FAIL | ${id} | score=${a.score} | ${a.title}`);
+              }
+            } catch {}
+          }
+          NODE
